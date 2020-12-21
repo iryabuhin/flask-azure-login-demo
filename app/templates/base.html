@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+        {% endblock %}
+
+        <title>{% block title %} Azure AD Demo App {% endblock %}</title>
+        {% endblock %}
+    </head>
+    <body>
+    {% block navbar %}
+    {% from "bootstrap/nav.html" import render_nav_item %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+        <div class="navbar-nav mr-auto">
+            {{ render_nav_item('.index', 'Главная') }}
+            {{ render_nav_item('.projects', 'Записаться на проект') }}
+        </div>
+        <div class="navbar-nav ml-auto">
+            {{ render_nav_item('.logout', 'Выйти') }}
+        </div>
+    </nav>
+    {% endblock %}
+    <!-- Your page content -->
+    {% block content %}{% endblock %}
+
+    {% block scripts %}
+    <!-- Optional JavaScript -->
+    {{ bootstrap.load_js() }}
+    {% endblock %}
+    </body>
+</html>

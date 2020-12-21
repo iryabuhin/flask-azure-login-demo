@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron vertical-center">
+<div class="container py-3">
+	<div class="row justify-content-center">
+		<div class="card bg-light">
+			<div class="card-header py-2">
+				<h4 class="mb-1 h4">Записаться на проект</h4>
+			</div>
+		<div class="card-body mx-3">
+			<form method="post" id="form" action="{{ url_for('.form_response') }}">
+
+				<div class="form-group row justify-content-between">
+					<div class="col-lg-10 pl-0">
+						<label for="displayName">ФИО</label>
+						<input name="entry.1846423724" id="displayName" class="form-control" required readonly value="{{ data['displayName'] }}">
+					</div>
+					<div class="col-lg-2 align-self-end pl-0">
+						<img class="rounded border border-secondary" src="data:image/jpeg;charset=utf-8;base64,  {{ image_b64 }}" style="height: 100%; width: 100%;">
+					</div>
+				</div> <!-- form-group// -->
+
+				<div class="form-group row">
+<!--						<span class="input-group-text"> <i class="fa {{ 'fa-graduation-cap' if data['jobTitle'] == 'студент' else 'fa-briefcase' }}"></i> </span>-->
+					<label for="group">Учебная группа</label>
+					<input name="entry.1205430654" id="group" class="form-control" type="text" required placeholder="Учебная группа">
+				 </div>
+
+				<div class="form-group row">
+<!--						<span class="input-group-text"> <i class="fa fa-envelope"></i> </span>-->
+					<label for="mail">Электроная почта</label>
+					<input name="entry.1774854861" id="mail" class="form-control" type="email" required value="{{ data['mail'] }}">
+				</div> <!-- form-group// -->
+
+				<div class="form-group row">
+<!--						<span class="input-group-text"> <i class="fa fa-phone"></i> </span>-->
+					<label for="phone">Номер телефона</label>
+					<input name="entry.583261472" id="phone" class="form-control" type="tel" required placeholder="Телефон">
+				</div> <!-- form-group// -->
+
+
+				<div class="form-group row pt-2">
+<!--						<span class="input-group-text"> <i class="fa fa-book"></i> </span>-->
+					<label for="project">Выберите проект</label>
+					<select class="form-control" id="project" name="entry.1716975243">
+						<option selected="">Выберите проект</option>
+						<option>Вариант 1</option>
+						<option>Вариант 2</option>
+						<option>Вариант 3</option>
+						<option>Вариант 4</option>
+						<option>Вариант 5</option>
+						<option>Вариант 6</option>
+					</select>
+				</div> <!-- form-group end.// -->
+
+				<input type="hidden" name="entry.1716975243_sentinel" value="">
+				<input type="hidden" name="fvv" value="1">
+				<input type="hidden" name="pageHistory" value="0">
+				<input type="hidden" name="draftResponse" value="[]">
+
+				<div class="form-group row pt-2">
+					<button type="submit" class="btn btn-lg btn-success btn-block"> Отправить  </button>
+				</div> <!-- form-group// -->
+
+			</form>
+		</div>
+		</div> <!-- card.// -->
+	</div>
+</div>
+	</div>
+{% endblock %}
