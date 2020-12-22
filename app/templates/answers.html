@@ -3,11 +3,27 @@
 {% block content %}
 <div class="jumbotron jumbotron-fluid vertical-center">
     <div class="container mx-auto my-auto">
-        <h2 class="display-4">Ваш ответ зарегистрирован</h2>
-        <p class="lead">Удостовериться в том, что ваш ответ записан можно в <a href="https://docs.google.com/spreadsheets/d/1xukXETuuDMrdxTXrX33FeKsbHo8KbtJZbuj9pd8MwFY/edit?usp=sharing">Google Таблице</a></p>
-        <hr class="my-4">
-        <p class="lead">Можно отправить еще один ответ. Можно два. Даже три.</p>
-        <p class="lead"><a class="btn btn-lg btn-block btn-primary" href="{{ url_for('.projects') }}">Большая синяя кнопка</a> </p>
+        {% if status == 'success' %}
+            <h2 class="display-4">Ваш ответ зарегистрирован</h2>
+            <p class="lead">Удостовериться в том, что ваш ответ записан можно в <a href="https://docs.google.com/spreadsheets/d/1pYu27lthhJRhhXJbGnLpkPOt_-iVrxCIqL5kDVdKcdI/edit?usp=sharing">Google Таблице</a></p>
+            <hr class="my-4">
+            <p class="lead"><a class="btn btn-lg btn-block btn-primary" href="{{ url_for('.projects') }}">Запись на проекты</a> </p>
+        {% endif %}
+        {% if status == 'in_team'%}
+            <p class="lead">Вы уже записались в команду</p>
+            <hr class="my-4">
+            <p class="lead"><a class="btn btn-lg btn-block btn-primary" href="{{ url_for('.projects') }}">Запись на проекты</a></p>
+        {% endif %}
+        {% if status == 'no_places'%}
+            <p class="lead">Мест в выбранной вами команде уже нет. Выберите другую команду или тему проекта.</p>
+            <hr class="my-4">
+            <p class="lead"><a class="btn btn-lg btn-block btn-primary" href="{{ url_for('.projects') }}">Запись на проекты</a></p>
+        {% endif %}
+        {% if status == 'error'%}
+            <p class="lead">Произошла ошибка при записи. Попробуйте позже.</p>
+            <hr class="my-4">
+            <p class="lead"><a class="btn btn-lg btn-block btn-primary" href="{{ url_for('.projects') }}">Запись на проекты</a></p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
