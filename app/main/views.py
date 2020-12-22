@@ -7,7 +7,7 @@ from functools import wraps
 from datetime import datetime, timedelta
 from . import main
 from .. import microsoft
-
+from .google_sheets import *
 
 # Implements refresh token logic, which is lacking in flask_oauthlib, oh pity
 def login_required(f):
@@ -101,10 +101,10 @@ def me():
 @login_required
 def projects():
     me = microsoft.get('me')
-    profile_image_data = microsoft.get('me/photo/$value').data
-    image_b64 = b64encode(profile_image_data).decode('utf-8')
+    # profile_image_data = microsoft.get('me/photo/$value').data
+    # image_b64 = b64encode(profile_image_data).decode('utf-8')
 
-    return render_template('form.html', data=me.data, image_b64=image_b64)
+    return render_template('form.html', data=me.data)
 
 
 @main.route('/form_response', methods=['POST'])
@@ -113,25 +113,21 @@ def form_response():
         abort(405)
 
     form_data = request.form
-    form_url = getenv('GOOGLE_FORM_URL')
-    user_agent = {
-        'Referer': form_url + '/viewform',
-        'User-Agent': "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36"
-    }
-
-    resp = requests.post(
-        url=form_url+'/formResponse',
-        data=form_data,
-        headers=user_agent
-    )
-    print(resp.status_code)
-
-    return redirect(url_for('.answers'))
+    project_theme = form_data['entry.1716975243']
+    user_data = f"{form_data['entry.1846423724']}, {form_data['entry.1205430654']}"
+    command_number = form_data['command_number']
+    print(project_theme)
+    print(user_data)
+    print(command_number)
+    status = join_team(theme=project_theme, command=command_number, data=user_data)
+    print(status)
+    return redirect(url_for('.answers', status=status))
 
 
-@main.route('/answers', methods=['GET', 'POST'])
+@main.route('/answers/', methods=['GET', 'POST'])
 def answers():
-    return render_template('answers.html')
+    status = request.args.get('status')
+    return render_template('answers.html', status=status)
 
 @microsoft.tokengetter
 def get_microsoft_oauth_token():

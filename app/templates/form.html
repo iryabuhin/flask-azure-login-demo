@@ -11,13 +11,8 @@
 			<form method="post" id="form" action="{{ url_for('.form_response') }}">
 
 				<div class="form-group row justify-content-between">
-					<div class="col-lg-10 pl-0">
 						<label for="displayName">ФИО</label>
 						<input name="entry.1846423724" id="displayName" class="form-control" required readonly value="{{ data['displayName'] }}">
-					</div>
-					<div class="col-lg-2 align-self-end pl-0">
-						<img class="rounded border border-secondary" src="data:image/jpeg;charset=utf-8;base64,  {{ image_b64 }}" style="height: 100%; width: 100%;">
-					</div>
 				</div> <!-- form-group// -->
 
 				<div class="form-group row">
@@ -42,17 +37,25 @@
 				<div class="form-group row pt-2">
 <!--						<span class="input-group-text"> <i class="fa fa-book"></i> </span>-->
 					<label for="project">Выберите проект</label>
-					<select class="form-control" id="project" name="entry.1716975243">
+					<select class="form-control" id="project" name="entry.1716975243" required>
 						<option selected="">Выберите проект</option>
-						<option>Вариант 1</option>
-						<option>Вариант 2</option>
+						<option>Телекоммуникационная сеть предприятия на основе ВОЛС</option>
+						<option>Приложение для анализа игры. Баскетбол</option>
 						<option>Вариант 3</option>
 						<option>Вариант 4</option>
 						<option>Вариант 5</option>
 						<option>Вариант 6</option>
 					</select>
 				</div> <!-- form-group end.// -->
-
+                <div class="form-group row pt-2">
+<!--						<span class="input-group-text"> <i class="fa fa-book"></i> </span>-->
+					<label for="project">Выберите номер команды</label>
+					<select class="form-control" id="project" name="command_number" required>
+						<option selected="">Выберите номер команды</option>
+						<option>Команда 1</option>
+						<option>Команда 2</option>
+					</select>
+				</div> <!-- form-group end.// -->
 				<input type="hidden" name="entry.1716975243_sentinel" value="">
 				<input type="hidden" name="fvv" value="1">
 				<input type="hidden" name="pageHistory" value="0">
