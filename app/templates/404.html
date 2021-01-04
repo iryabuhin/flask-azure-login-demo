@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+        <h4 class="display-4" style="color: red">404</h4>
+        <p class="lead">Такой страницы не имеется</p>
+        <hr>
+        <p class="lead"><a href="{{ url_for('main.index') }}">Вернуться на главную</a> </p>
+    </div>
+</div>
+{% endblock %}

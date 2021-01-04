@@ -1,15 +1,16 @@
-from flask import request, render_template, redirect, url_for, abort, session
+from flask import request, render_template, redirect, url_for, abort, session, jsonify
 from base64 import b64encode
 import uuid
-from os import getenv
-import requests
 from functools import wraps
 from datetime import datetime, timedelta
 from . import main
 from .. import microsoft
 from .google_sheets import *
+from .ictis_api import get_student_data
+from .verify_form import check_form_data
+from app import mongo_client
 
-# Implements refresh token logic, which is lacking in flask_oauthlib, oh pity
+
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -100,11 +101,25 @@ def me():
 @main.route('/projects')
 @login_required
 def projects():
-    me = microsoft.get('me')
+    me = microsoft.get('me').data
+    email = me.get('mail')
+
+    # because azure doesnt work properly on localhost
+    if email is None:
+        email = me.get('givenName')
+
+    student_data = get_student_data(email)
+
+    db = mongo_client['projects']
+    projects_collection = db['projects']
+
+    docs_iter = projects_collection.find({}, {'name': 1})
+    themes = [doc['name'] for doc in docs_iter]
+
     # profile_image_data = microsoft.get('me/photo/$value').data
     # image_b64 = b64encode(profile_image_data).decode('utf-8')
 
-    return render_template('form.html', data=me.data)
+    return render_template('form.html', data=student_data, themes=themes)
 
 
 @main.route('/form_response', methods=['POST'])
@@ -112,14 +127,24 @@ def form_response():
     if request.method == 'GET':
         abort(405)
 
-    form_data = request.form
-    project_theme = form_data['entry.1716975243']
-    user_data = f"{form_data['entry.1846423724']}, {form_data['entry.1205430654']}"
-    command_number = form_data['command_number']
-    print(project_theme)
+    me = microsoft.get('me')
+    microsoft_displayName = me.data['displayName']
+    microsoft_mail = me.data['mail']
+    user_group = get_student_data(microsoft_mail)
+    user_data = f"{microsoft_displayName}, {user_group}"
     print(user_data)
-    print(command_number)
-    status = join_team(theme=project_theme, command=command_number, data=user_data)
+
+    form_data = request.form
+    form_project_theme = form_data['entry.1716975243']
+    form_user_data = f"{form_data['entry.1846423724']}, {form_data['entry.1205430654']}"
+    form_command_number = form_data['command_number']
+    data_check = check_form_data(form_user_data=form_user_data,
+                                 user_data=user_data,
+                                 theme_project=form_project_theme,
+                                 command=form_command_number)
+    if not data_check:
+        return "Некорректные данные формы. Проверьте ваше ФИО, группу, тему проекта и команду"
+    status = join_team(theme=form_project_theme, command=form_command_number, data=user_data)
     print(status)
     return redirect(url_for('.answers', status=status))
 
@@ -128,6 +153,7 @@ def form_response():
 def answers():
     status = request.args.get('status')
     return render_template('answers.html', status=status)
+
 
 @microsoft.tokengetter
 def get_microsoft_oauth_token():

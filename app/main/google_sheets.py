@@ -4,12 +4,14 @@ import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
+from config import basedir
+from flask import current_app, app
 
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-CREDENTIALS_FILE = basedir + '\creds.json'
+CREDENTIALS_FILE = os.path.join(basedir, 'google-credentials.json')
 
-spreadsheet_id = '1pYu27lthhJRhhXJbGnLpkPOt_-iVrxCIqL5kDVdKcdI'
+
+spreadsheet_id = os.environ.get('SPREADSHEET_ID')
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(
     CREDENTIALS_FILE,
@@ -18,17 +20,20 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(
 httpAuth = credentials.authorize(httplib2.Http())
 service = apiclient.discovery.build('sheets', 'v4', http = httpAuth)
 
+
 def is_in_team(data):
+    table_data = []
     flag = False
     values = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="B9:AC34",
         majorDimension='COLUMNS'
     ).execute()
-    table_data = values['values'][0]
+    for i in values['values']:
+        table_data += i
     for i in range(len(table_data)):
         table_data[i] = table_data[i].rstrip()
-    if data in values['values'][0]:
+    if data in table_data:
         flag = True
     return flag
 
@@ -44,10 +49,9 @@ def get_command_squad(theme_column_index, row_index_range):
 
 
 def join_team(theme, command, data):
-    project_themes = basedir + "\project_themes.json"
+    project_themes = 'project_themes.json'
     with open(project_themes, "r", encoding='utf-8') as read_file:
         projects_columns_dict = json.load(read_file)
-
     print(projects_columns_dict)
     command_number = {"Команда 1": [9, 16], "Команда 2": [18, 25], "Команда 3": [27, 34]}
     theme_column_index = projects_columns_dict[theme]

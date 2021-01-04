@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_oauthlib.client import OAuth, OAuthException
+from pymongo import MongoClient
 from config import config
 import os
 
 bootstrap = Bootstrap()
 oauth = OAuth()
+mongo_client = MongoClient(os.environ.get('MONGO_URI'))
 
 tenant_name = os.getenv('APP_AAD_TENANT')
 microsoft = oauth.remote_app(
@@ -33,6 +35,9 @@ def create_app(config_name: str):
         sslify = SSLify(app)
 
     from .main import main as main_blueprint
-    app.register_blueprint(main_blueprint, url_prefix='')
+    app.register_blueprint(main_blueprint)
+
+    from .api import api as api_blueprint
+    app.register_blueprint(api_blueprint)
 
     return app

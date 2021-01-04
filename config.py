@@ -4,15 +4,24 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you_will_never_guess'
-    
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
 
     APP_OAUTH_ID = os.environ.get('APP_OAUTH_ID')
     APP_OAUTH_SECRET = os.environ.get('APP_OAUTH_SECRET')
     APP_OAUTH_TENANT = os.environ.get('APP_AAD_TENANT')
-    
+
     BASE_GRAPH_API_URL = 'https://graph.microsoft.com/v1.0/'
+
+    SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
+
+    ICTIS_API_URL = os.environ.get('ICTIS_API_URL')
+    ICTIS_API_LOGIN = os.environ.get('ICTIS_API_LOGIN')
+    ICTIS_API_PASSWORD = os.environ.get('ICTIS_API_PASSWORD')
+
+    MONGO_URI = os.environ.get('MONGO_URI') or os.environ.get('DATABASE_URI')
+    MONGO_DBNAME = os.environ.get('MONGO_DBNAME')
 
     @staticmethod
     def init_app(app):
@@ -65,6 +74,6 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'heroku': HerokuConfig,
-    
+
     'default': DevelopmentConfig
 }

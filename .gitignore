@@ -139,7 +139,8 @@ cython_debug/
 
 .DS_Store
 .env
-app/main/creds.json
+./app/main/google-credentials.json
+google-credentials.json
 .flaskenv
 *.pyc
 *.pyo

@@ -8,60 +8,42 @@
 				<h4 class="mb-1 h4">Записаться на проект</h4>
 			</div>
 		<div class="card-body mx-3">
-			<form method="post" id="form" action="{{ url_for('.form_response') }}">
+			<form method="post" id="form" action="{{ url_for('main.form_response') }}">
 
 				<div class="form-group row justify-content-between">
-						<label for="displayName">ФИО</label>
-						<input name="entry.1846423724" id="displayName" class="form-control" required readonly value="{{ data['displayName'] }}">
+						<label for="fullName">ФИО</label>
+                    	<div class="form-control" id="fullName" readonly="">{{ data['fullName'] }}</div>
 				</div> <!-- form-group// -->
 
 				<div class="form-group row">
-<!--						<span class="input-group-text"> <i class="fa {{ 'fa-graduation-cap' if data['jobTitle'] == 'студент' else 'fa-briefcase' }}"></i> </span>-->
 					<label for="group">Учебная группа</label>
-					<input name="entry.1205430654" id="group" class="form-control" type="text" required placeholder="Учебная группа">
+					<div id="group" class="form-control" readonly="">{{ data['group'] }}</div>
 				 </div>
 
 				<div class="form-group row">
-<!--						<span class="input-group-text"> <i class="fa fa-envelope"></i> </span>-->
-					<label for="mail">Электроная почта</label>
-					<input name="entry.1774854861" id="mail" class="form-control" type="email" required value="{{ data['mail'] }}">
+					<label for="email">Электроная почта</label>
+					<div class="form-control" readonly="" id="email">{{ data['email'] }}</div>
 				</div> <!-- form-group// -->
-
-				<div class="form-group row">
-<!--						<span class="input-group-text"> <i class="fa fa-phone"></i> </span>-->
-					<label for="phone">Номер телефона</label>
-					<input name="entry.583261472" id="phone" class="form-control" type="tel" required placeholder="Телефон">
-				</div> <!-- form-group// -->
-
 
 				<div class="form-group row pt-2">
-<!--						<span class="input-group-text"> <i class="fa fa-book"></i> </span>-->
-					<label for="project">Выберите проект</label>
-					<select class="form-control" id="project" name="entry.1716975243" required>
-						<option selected="">Выберите проект</option>
-						<option>Телекоммуникационная сеть предприятия на основе ВОЛС</option>
-						<option>Приложение для анализа игры. Баскетбол</option>
-						<option>Вариант 3</option>
-						<option>Вариант 4</option>
-						<option>Вариант 5</option>
-						<option>Вариант 6</option>
+					<label for="projectSelect">Выберите проект</label>
+					<select class="form-control" id="projectSelect" required name="entry.1716975243">
+						<option selected="" value="">Выберите проект</option>
+                        {% for project_theme in themes %}
+							<option>{{ project_theme }}</option>
+						{% endfor %}
 					</select>
 				</div> <!-- form-group end.// -->
-                <div class="form-group row pt-2">
-<!--						<span class="input-group-text"> <i class="fa fa-book"></i> </span>-->
-					<label for="project">Выберите номер команды</label>
-					<select class="form-control" id="project" name="command_number" required>
-						<option selected="">Выберите номер команды</option>
-						<option>Команда 1</option>
-						<option>Команда 2</option>
-					</select>
-				</div> <!-- form-group end.// -->
+				{% block team_select %}
+					<div id="teamSelectDiv" class="row pt-2">
+					</div>
+                {% endblock %}
 				<input type="hidden" name="entry.1716975243_sentinel" value="">
 				<input type="hidden" name="fvv" value="1">
 				<input type="hidden" name="pageHistory" value="0">
 				<input type="hidden" name="draftResponse" value="[]">
 
-				<div class="form-group row pt-2">
+				<div class="form-group row my-4">
 					<button type="submit" class="btn btn-lg btn-success btn-block"> Отправить  </button>
 				</div> <!-- form-group// -->
 
@@ -70,5 +52,8 @@
 		</div> <!-- card.// -->
 	</div>
 </div>
-	</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/checkProjects.js') }}"></script>
 {% endblock %}
