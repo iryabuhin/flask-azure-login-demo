@@ -5,10 +5,9 @@ from functools import wraps
 from datetime import datetime, timedelta
 from . import main
 from .. import microsoft
-from .google_sheets import *
 from .ictis_api import get_student_data
-from .verify_form import check_form_data
-from app import mongo_client
+# from .verify_form import check_form_data
+from app import mongo
 
 
 def login_required(f):
@@ -86,16 +85,9 @@ def authorized():
 
     session['microsoft_token'] = (response['access_token'], '')
     session['expires_at'] = datetime.now() + timedelta(seconds=int(response['expires_in']))
+    session['refresh_token'] = response['refresh_token']
 
     return redirect(url_for('.projects'))
-
-
-@main.route('/me')
-@login_required
-def me():
-    me = microsoft.get('/beta/me/profile')
-    data = me.data
-    return render_template('me.html', me=data)
 
 
 @main.route('/projects')
@@ -108,18 +100,23 @@ def projects():
     if email is None:
         email = me.get('givenName')
 
-    student_data = get_student_data(email)
+    student_data = get_student_data(email) # TODO добавить проверку на первый/второй курс
 
-    db = mongo_client['projects']
-    projects_collection = db['projects']
+    pipeline = [
+        {'$group': {
+            '_id': '$mentorName',
+            'projects': {'$push': {'name': '$name', '_id': '$_id'}}
+        }}
+    ]
 
-    docs_iter = projects_collection.find({}, {'name': 1})
-    themes = [doc['name'] for doc in docs_iter]
+    projects_collection = mongo.db.projects
+    test = list(projects_collection.aggregate(pipeline))
+    projects_by_mentor = {doc['_id']: doc['projects'] for doc in test}
 
     # profile_image_data = microsoft.get('me/photo/$value').data
     # image_b64 = b64encode(profile_image_data).decode('utf-8')
 
-    return render_template('form.html', data=student_data, themes=themes)
+    return render_template('project_select.html', data=student_data, projects_by_mentor=projects_by_mentor)
 
 
 @main.route('/form_response', methods=['POST'])

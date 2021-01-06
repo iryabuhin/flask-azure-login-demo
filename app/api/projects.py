@@ -1,38 +1,48 @@
 from typing import Optional, Dict, Union, List
 from flask import jsonify, request, current_app, url_for, Response
 from . import api
-from .. import mongo_client
+from app import mongo
+from bson.objectid import ObjectId
+from pymongo.errors import PyMongoError, OperationFailure
+from pymongo import ReturnDocument
+from app.main.sheets import sheets_team_add_member
 
 
-def find_project_by_name(name: str) -> Dict[str, Union[str, List[Dict[str, str]]]]:
-    coll = get_projects_collection()
-    proj = coll.find_one(filter={'name': name})
+def get_project_by_id(id: str, fields: List[str] = None) -> Dict:
+    projection = None
+    if fields is not None:
+        projection = {field: 1 for field in fields}
+    try:
+        proj = mongo.db.projects.find_one(filter={'_id': ObjectId(id)}, projection=projection)
+    except OperationFailure as e:
+        return error('database operation error', 500, data={'code': e.code, 'details': e.details})
+    except PyMongoError as e:
+        return error('database error', 500)
+
+    if not proj:
+        return error('Проект не найден')
+
     return proj
 
 
-def find_not_full_teams_for_project(project_doc: Dict):
-    teams_not_empty = list()
-    for team in project_doc.get('teams'):
-        if not team.get('isFull'):
-            teams_not_empty.append(team)
+def get_project_by_name(query: str) -> Dict:
+    try:
+        doc = mongo.db.projects.find({'$text': {'$search': query}})
+    except OperationFailure as e:
+        return error('database operational error', 500, data=[e.code, e.details])
 
-    return teams_not_empty
-
-
-def get_projects_collection():
-    db = mongo_client[current_app.config['MONGO_DBNAME']]
-    collection = db['projects']
-
-    return collection
+    return success('found', data=list(doc))
 
 
 def json_response(status: str, message: str,
                   data: Dict = None,
-                  status_code: int = None) -> Response:
+                  status_code: int = None,
+                  **kwargs) -> Response:
     response: Response = jsonify({
         'status': status,
         'message': message,
-        'data': data
+        'data': data,
+        **kwargs
     })
     if status_code is not None:
         response.status_code = status_code
@@ -40,29 +50,88 @@ def json_response(status: str, message: str,
     return response
 
 
-def success(message: str, data: Dict) -> Response:
-    return json_response('success', message, data=data)
+def success(message: str, data: Dict, **kwargs) -> Response:
+    return json_response('success', message, data=data, **kwargs)
 
 
-def error(message: str, status_code: int = None) -> Response:
-    return json_response('error', message, status_code=status_code)
+def error(message: str, status_code: int = None, **kwargs) -> Response:
+    return json_response('error', message, status_code=status_code, **kwargs)
 
 
-@api.route('/api/projects/available', methods=['GET'])
-def check_project_availability():
-    project_name = request.args.get('projectName')
+@api.route('/api/projects/<id>/', methods=['GET'])
+def projects_get(id: str):
+    return get_project_by_id(id)
 
-    if project_name is None:
-        return error('no project name provided in query')
 
-    proj = find_project_by_name(project_name)
+@api.route('/api/projects/find/<query>', methods=['GET'])
+def get_by_name_proj(query: str):
+    return get_project_by_name(query)
 
-    if not proj:
-        return error('project with name "{}" not found'.format(project_name))
+
+@api.route('/api/projects/<id>/available', methods=['GET'])
+def check_project_availability(id: str):
+    proj = get_project_by_id(id)
 
     if proj.get('availableForJoin'):
-        teams_not_full = find_not_full_teams_for_project(proj)
-        return success('found', data={'teams': teams_not_full})
+        return success('found', data={'teams': proj.get('teams')})
     else:
         return error('Записаться на данный проект невозможно, пожалуйста, выберите другой проект из списка')
+
+
+@api.route('/api/projects/<id>/teams', methods=['GET'])
+def get_project_teams(id: str):
+    pass
+
+
+@api.route('/api/projects/<id>/join', methods=['PUT'])
+def join_project(id: str):
+    params = ('name', 'group', 'team')
+    missing_params = []
+
+    req = request.json
+    for param in params:
+        if param not in req:
+            missing_params.append(param)
+    if missing_params:
+        return error(f'missing parameters in body: {", ".join(missing_params)}', 400)
+
+    name, group, team = req['name'], req['group'], req['team']
+
+    count = mongo.db.projects.count_documents({'teams.members.fullName': name})
+
+    if count > 1:
+        proj = get_project_by_id(id, fields=['name'])
+        return error(f'Вы уже записаны на проект "{proj["name"]}"')
+
+    # названия команд в формате "Команда N (свободных мест: P)"
+    team_number = int(team.split()[1]) - 1
+    document_team_field_string = f'teams.{str(team_number)}.members'
+
+    updated_document = mongo.db.projects.find_one_and_update(
+        {'_id': ObjectId(id)},
+        {
+            # добавить участника в команду с номером team_number
+            '$push': {
+                document_team_field_string: {
+                    'fullName': name,
+                    'group': group
+                }
+            },
+            # декрементировать количество свободных мест в этой команде на единицу
+            '$inc': {
+                f'teams.{str(team_number)}.emptySlots': -1
+            }
+        },
+        return_document=ReturnDocument.AFTER
+    )
+
+
+    sheet_cell_index = sheets_team_add_member(
+        f'{name}, {group}',
+        updated_document['teams'][team_number]['sheetCellIndex'],
+        updated_document['teams'][team_number]['emptySlots']
+    )
+
+    if sheet_cell_index:
+        return success('insertion successful', data={'cellIndex': sheet_cell_index})
 

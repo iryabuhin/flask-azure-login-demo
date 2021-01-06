@@ -1,0 +1,49 @@
+{% extends "card.html" %}
+{% block styles %}
+<style>
+	.dropdown-header {
+		padding: 0 1rem;
+	}
+	.dropdown-divider {
+		margin: 0.25rem 0;
+	}
+</style>
+{% endblock %}
+
+{% block card_body %}
+<form method="post" id="form" action="{{ url_for('main.form_response') }}">
+	<div class="form-group row justify-content-between">
+			<label for="fullName">ФИО</label>
+			<div class="form-control" id="fullName" readonly="">{{ data['fullName'] }}</div>
+	</div> <!-- form-group// -->
+
+	<div class="form-group row">
+		<label for="group">Учебная группа</label>
+		<div id="group" class="form-control" readonly="">{{ data['group'] }}</div>
+	 </div>
+
+	<div class="form-group row">
+		<label for="email">Электроная почта</label>
+		<div class="form-control" readonly="" id="email" >{{ data['email'] }}</div>
+	</div> <!-- form-group// -->
+
+	<div class="row py-2 justify-content-center">
+        <div class="form-group">
+			<select id="projectSelect" class="selectpicker show-tick" data-width="500px" title="Выберите проект..." data-live-search="true" data-width="auto" data-style="btn-primary" data-size="10">
+				{% for mentor, projects in projects_by_mentor.items() %}
+					<optgroup label="{{ mentor }}">
+						{% for proj in projects %}
+							<option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
+						{% endfor %}
+					</optgroup>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	{% block team_select %}
+		<div id="teamSelectDiv" class="row py-2 justify-content-center">
+		</div>
+	{% endblock %}
+</form>
+{% endblock %}

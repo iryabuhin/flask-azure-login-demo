@@ -1,13 +1,13 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_oauthlib.client import OAuth, OAuthException
-from pymongo import MongoClient
+from flask_pymongo import PyMongo
 from config import config
 import os
 
 bootstrap = Bootstrap()
 oauth = OAuth()
-mongo_client = MongoClient(os.environ.get('MONGO_URI'))
+mongo = PyMongo()
 
 tenant_name = os.getenv('APP_AAD_TENANT')
 microsoft = oauth.remote_app(
@@ -29,6 +29,7 @@ def create_app(config_name: str):
 
     bootstrap.init_app(app)
     oauth.init_app(app)
+    mongo.init_app(app)
 
     if app.config['SSL_REDIRECT']:
         from flask_sslify import SSLify

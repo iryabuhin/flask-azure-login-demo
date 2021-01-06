@@ -10,11 +10,14 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mt-3 mb-4">
-                        <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('.login') }}">Войти</a>
+                        <a class="btn btn-secondary btn-block align-top d-inline-block" href="{{ url_for('.login') }}">
+                            <img src="{{ url_for('static', filename='images/logo_sfedu.png') }}" width="30" height="30" class=""> Войти
+                        </a>
                     </ul>
                 </div>
             </div>
     </div>
+</div>
 </div>
 
 {% endblock %}

@@ -1,0 +1,10 @@
+{% extends "card.html" %}
+
+{% block card_body %}
+<form>
+    <div class="form-group row">
+        <label for="project">Тема проекта</label>
+        <div id="project" class="form-control" readonly="" required="">{{ theme }}</div>
+    </div>
+</form>
+{% endblock %}

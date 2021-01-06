@@ -1,0 +1,7 @@
+{% extends "error.html" %}
+{% block error_code %}Ой, 500{%block error_code %}
+{% block error %}
+<p class="lead">Что-то сломалось. Но мы это обязательно починим!</p>
+<hr>
+<p class="lead"><a href="{{ url_for('main.index') }}">Вернуться на главную</a> </p>
+{% endblock %}

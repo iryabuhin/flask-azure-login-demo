@@ -14,6 +14,7 @@ class Config:
 
     BASE_GRAPH_API_URL = 'https://graph.microsoft.com/v1.0/'
 
+    GOOGLE_CREDENTIALS = os.path.join(basedir, 'credentials.json')
     SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 
     ICTIS_API_URL = os.environ.get('ICTIS_API_URL')
@@ -22,6 +23,7 @@ class Config:
 
     MONGO_URI = os.environ.get('MONGO_URI') or os.environ.get('DATABASE_URI')
     MONGO_DBNAME = os.environ.get('MONGO_DBNAME')
+
 
     @staticmethod
     def init_app(app):
