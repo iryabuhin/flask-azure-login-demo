@@ -5,9 +5,9 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource
 from google.auth.transport.requests import Request
-from flask import current_app
+from typing import Dict, List, Optional, Any
 from json import JSONDecodeError
-from config import basedir
+from googleapiclient.errors import HttpError, Error
 
 TEAM_MAX_SIZE = 8
 GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_CREDENTIALS')
@@ -42,30 +42,46 @@ def get_sheets_service() -> Resource:
     return service
 
 
-def sheets_team_add_member(value: str, team_cell_index: str, team_empty_slots: int):
+def sheets_write_to_cell(service: Resource, spreadsheet_id: str, cell: str, value: str) -> Dict[str, str]:
+    try:
+        result: Dict = service.spreadsheets().values().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body={
+                'valueInputOption': 'RAW',
+                'includeValuesInResponse': True,
+                'data': [
+                    {
+                        'range': cell,
+                        'majorDimension': 'ROWS',
+                        'values': [[value]]
+                    },
+                ]
+            }
+        ).execute()
+
+        if result.get('totalUpdatedCells') == 1:
+            result.update({'index': cell})
+            return {'status': 'success', 'result': result}
+
+    except HttpError as e:
+        return {'status': 'error', 'error_name': 'http_error', 'details': e.error_details}
+    except Error as e:
+        return {'status': 'error', 'error_name': 'api_error', 'details': {'type': 'unknown'}}
+    except:
+        raise
+
+
+def sheets_team_add_member(value: str, team_cell_index: str, team_empty_slots: int) -> Dict[str, str]:
     service = get_sheets_service()
 
     col = re.search('[A-Z]+', team_cell_index).group(0)
 
     team_name_row = int(re.search('[0-9]+', team_cell_index).group(0))
     places_taken = TEAM_MAX_SIZE - team_empty_slots
-    row = team_name_row + places_taken + 1
-    index = col + str(row)
+    row = team_name_row + places_taken
+    cell_index = col + str(row)
 
+    result = sheets_write_to_cell(service, os.environ.get('SPREADSHEET_ID'), cell_index, value)
 
-    values = service.spreadsheets().values().batchUpdate(
-        spreadsheetId=os.environ.get('SPREADSHEET_ID'),
-        body={
-            'valueInputOption': 'USER_ENTERED',
-            'data': [
-                {
-                    'range': index,
-                    'majorDimension': 'ROWS',
-                    'values': [[value]]},
-                ]
-            }
-    ).execute()
-
-    return index
-
+    return result
 

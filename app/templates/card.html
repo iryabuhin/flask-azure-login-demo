@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-	<div class="row align-items-center">
-		<div class="col-sm-12 mx-auto my-auto">
+	<div class="row align-items-center justify-content-center h-100">
+		<div class="col-sm-12 col-lg-4 col-md-7 align-self-center">
 			<div class="card bg-light">
 				<div class="card-header py-2">
 					{% block card_header %}
@@ -12,6 +12,8 @@
 					{% block card_body %}
 					{% endblock %}
 				</div>
+				{% block card_footer %}
+				{% endblock %}
 			</div> <!-- card.// -->
 		</div>
 	</div>

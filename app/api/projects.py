@@ -1,12 +1,12 @@
 from typing import Optional, Dict, Union, List
-from flask import jsonify, request, current_app, url_for, Response
+from flask import jsonify, request, current_app, url_for, redirect, render_template, Response
 from . import api
 from app import mongo
 from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError, OperationFailure
 from pymongo import ReturnDocument
 from app.main.sheets import sheets_team_add_member
-
+from flask_required_args import required_data
 
 def get_project_by_id(id: str, fields: List[str] = None) -> Dict:
     projection = None
@@ -84,22 +84,11 @@ def get_project_teams(id: str):
 
 
 @api.route('/api/projects/<id>/join', methods=['PUT'])
-def join_project(id: str):
-    params = ('name', 'group', 'team')
-    missing_params = []
-
-    req = request.json
-    for param in params:
-        if param not in req:
-            missing_params.append(param)
-    if missing_params:
-        return error(f'missing parameters in body: {", ".join(missing_params)}', 400)
-
-    name, group, team = req['name'], req['group'], req['team']
-
+@required_data
+def join_project(id: str, name: str, group: str, team: str):
     count = mongo.db.projects.count_documents({'teams.members.fullName': name})
 
-    if count > 1:
+    if count >= 1:
         proj = get_project_by_id(id, fields=['name'])
         return error(f'Вы уже записаны на проект "{proj["name"]}"')
 
@@ -126,12 +115,19 @@ def join_project(id: str):
     )
 
 
-    sheet_cell_index = sheets_team_add_member(
+    insert_result = sheets_team_add_member(
         f'{name}, {group}',
         updated_document['teams'][team_number]['sheetCellIndex'],
-        updated_document['teams'][team_number]['emptySlots']
+        updated_document['teams'][team_number]['emptySlots'] + 1
     )
 
-    if sheet_cell_index:
-        return success('insertion successful', data={'cellIndex': sheet_cell_index})
+    if insert_result['status'] == 'success':
+        insert_result = insert_result['result']
 
+        return success('insertion successful', data={
+            'cellIndex': insert_result.get('index'),
+            'teamNumber': int(team_number) + 1,
+            'projectName': updated_document['name']
+        })
+
+    return error('insertion failed')

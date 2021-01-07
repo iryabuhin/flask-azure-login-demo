@@ -4,7 +4,7 @@
         {% block head %}
         <!-- Required meta tags -->
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, height=device-height initial-scale=1, shrink-to-fit=no">
          <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -14,6 +14,13 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
         {% endblock %}
+        <style>
+            body {
+                min-height: 100vh;
+                height: 100vh;
+                padding: 0;
+            }
+        </style>
 
         <title>{% block title %} Azure AD Demo App {% endblock %}</title>
         {% endblock %}
@@ -21,7 +28,7 @@
     <body>
     {% block navbar %}
     {% from "bootstrap/nav.html" import render_nav_item %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+    <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
         <a class="navbar-brand" href="{{ url_for('main.index') }}">
             <img src="{{ url_for('static', filename='images/logo_proictis_light.png') }}" width="150" height="35" class="d-inline-block align-top" alt="logo proictis">
         </a>
@@ -34,7 +41,7 @@
     </nav>
     {% endblock %}
     <!-- Your page content -->
-    <div class="container">
+    <div class="container-fluid h-100">
         {% block content %}
         {% endblock %}
     </div>
@@ -44,5 +51,9 @@
     <script src="/static/js/vendor/bootstrap-select.js"></script>
     {% block scripts %}
     {% endblock %}
+    <footer class="page-footer">
+        <div class="container text-dark">
+        </div>
+    </footer>
     </body>
 </html>

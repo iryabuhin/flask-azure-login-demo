@@ -2,9 +2,12 @@
 
 {% block content %}
 <div class="container">
-    <div class="jumbotron">
-        <h4 class="display-4" style="color: rgb(200, 10, 20)">{% block error_code %} {% endblock %}</h4>
+    <div class="jumbotron align-self-center jumbotron-vertical-center">
+        <h4 class="display-4">{% block error_code %}{% if error_message is defined %}{{ error_header }}{% endif %}{% endblock %}</h4>
         {% block error %}
+        {% if error_message is defined %}
+        {{ error_message }}
+        {% endif %}
         {% endblock %}
     </div>
 </div>

@@ -12,10 +12,11 @@ $(function() {
                         $('.bootstrap-select > .dropdown-toggle').css('background-color', '#d9534f');
 
                         $('#teamSelectDiv').empty();
-                        $('#teamSelectDiv').append(`<p class="lead font-weight-bold">${response.message}</p>`);
+                        $('#teamSelectDiv').append(`<p class="lead">${response.message}</p>`);
                         break;
                     case 'success':
                         $('.bootstrap-select > .dropdown-toggle').css('background-color', originalDropdownSelectBackgroundColor);
+                        $('form').append('<div class="row justify-content-center" id="teamSelectDiv"></div>')
 
                         $('#teamSelectDiv').empty();
                         $('#submitButtonDiv').empty();
@@ -28,9 +29,8 @@ $(function() {
                         });
 
                         $('.selectpicker').selectpicker();
-
-                        $('form').append('<div id="submitButtonDiv" class="row my-3 justify-content-center"></div>');
-                        $('form > .row').last().append('<button type="submit" class="btn btn-lg btn-success"> Отправить  </button>')
+                        $('.card-footer').empty()
+                        $('.card-footer').append('<button type="submit" id="submit" class="btn btn-lg btn-success"> Записаться </button>');
 
                         break;
                 }
@@ -40,14 +40,14 @@ $(function() {
             });
     });
 
-    $(document).on('submit', 'form', function (event) {
+    $(document).on('click', '#submit', function (event) {
         event.preventDefault();
 
         if (!$(document).find('#teamSelect') || $('#teamSelect').val() === 'default') {
             return;
         }
 
-        let selectedProjectDocumentId = $(this).find(':selected').data('documentId');
+        let selectedProjectDocumentId = $('#projectSelect').find(':selected').data('documentId');
         let data = {
             name: $('#fullName').text(),
             group: $('#group').text(),
@@ -58,16 +58,18 @@ $(function() {
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data)
-        }).done(function (resp) {
-            switch (resp.status) {
+        }).done(function (response) {
+            let data = response.data;
+            switch (response.status) {
                 case 'success':
-                    window.location = '/#';
+                    $.ajax('/success')
+                    window.location = `/success?team_number=${data.teamNumber}&cell_index=${data.cellIndex}&project_name=${data.projectName}`
                 case 'error':
 
             }
 
         }).fail(function (resp) {
             console.error(resp);
-        })
+        });
     });
 });

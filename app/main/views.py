@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, abort, session, jsonify
+from flask import request, render_template, redirect, url_for, abort, session, jsonify, current_app
 from base64 import b64encode
 import uuid
 from functools import wraps
@@ -8,6 +8,8 @@ from .. import microsoft
 from .ictis_api import get_student_data
 # from .verify_form import check_form_data
 from app import mongo
+from flask_required_args import required_data
+from pymongo import CursorType
 
 
 def login_required(f):
@@ -100,7 +102,21 @@ def projects():
     if email is None:
         email = me.get('givenName')
 
-    student_data = get_student_data(email) # TODO добавить проверку на первый/второй курс
+    # TODO добавить проверку на первый/второй курс
+    student_data = get_student_data(email)
+
+    doc = mongo.db.projects.find_one(
+        filter={'teams.members.fullName': student_data['fullName']},
+        projection={'name': 1, 'teams.name': 1}
+    )
+    if doc:
+        return render_template(
+            'error.html',
+            error_header='Вы уже записаны на проект',
+            error_message='Вы уже записаны на творческий проект "{}"'.format(
+                doc['name'],
+            )
+        )
 
     pipeline = [
         {'$group': {
@@ -110,8 +126,11 @@ def projects():
     ]
 
     projects_collection = mongo.db.projects
-    test = list(projects_collection.aggregate(pipeline))
-    projects_by_mentor = {doc['_id']: doc['projects'] for doc in test}
+    docs = list(projects_collection.aggregate(pipeline))
+    projects_by_mentor = {doc['_id']: doc['projects'] for doc in docs}
+
+    # работает приблизительно в 5 раз быстрее, но требует дополнительной обработки
+    # docs = list(mongo.db.projects.find(cursor_type=CursorType.EXHAUST).sort([('$natural', 1)]))
 
     # profile_image_data = microsoft.get('me/photo/$value').data
     # image_b64 = b64encode(profile_image_data).decode('utf-8')
@@ -119,37 +138,27 @@ def projects():
     return render_template('project_select.html', data=student_data, projects_by_mentor=projects_by_mentor)
 
 
-@main.route('/form_response', methods=['POST'])
-def form_response():
-    if request.method == 'GET':
-        abort(405)
+@main.route('/success', methods=['GET'])
+def after_successfull_team_join():
+    team_number = request.args.get('team_number')
+    cell_index = request.args.get('cell_index')
+    project_name = request.args.get('project_name')
 
-    me = microsoft.get('me')
-    microsoft_displayName = me.data['displayName']
-    microsoft_mail = me.data['mail']
-    user_group = get_student_data(microsoft_mail)
-    user_data = f"{microsoft_displayName}, {user_group}"
-    print(user_data)
+    if any(arg is None for arg in [team_number, cell_index, project_name]):
+        return jsonify({'status': 'error', 'message': 'not all params are present in the query string'}), 400
 
-    form_data = request.form
-    form_project_theme = form_data['entry.1716975243']
-    form_user_data = f"{form_data['entry.1846423724']}, {form_data['entry.1205430654']}"
-    form_command_number = form_data['command_number']
-    data_check = check_form_data(form_user_data=form_user_data,
-                                 user_data=user_data,
-                                 theme_project=form_project_theme,
-                                 command=form_command_number)
-    if not data_check:
-        return "Некорректные данные формы. Проверьте ваше ФИО, группу, тему проекта и команду"
-    status = join_team(theme=form_project_theme, command=form_command_number, data=user_data)
-    print(status)
-    return redirect(url_for('.answers', status=status))
+    sheet_url = 'https://docs.google.com/spreadsheets/d/{}/view#gid=0&range={}'.format(
+        current_app.config['SPREADSHEET_ID'],
+        cell_index
+    )
 
-
-@main.route('/answers/', methods=['GET', 'POST'])
-def answers():
-    status = request.args.get('status')
-    return render_template('answers.html', status=status)
+    return render_template(
+        'success.html',
+        cell_index=cell_index,
+        project_name=project_name,
+        team_number=team_number,
+        sheet_url=sheet_url
+    )
 
 
 @microsoft.tokengetter

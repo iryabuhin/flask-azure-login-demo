@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block card_body %}
-<form method="post" id="form" action="{{ url_for('main.form_response') }}">
+<form>
 	<div class="form-group row justify-content-between">
 			<label for="fullName">ФИО</label>
 			<div class="form-control" id="fullName" readonly="">{{ data['fullName'] }}</div>
@@ -29,6 +29,7 @@
 
 	<div class="row py-2 justify-content-center">
         <div class="form-group">
+			<div class="col-12">
 			<select id="projectSelect" class="selectpicker show-tick" data-width="500px" title="Выберите проект..." data-live-search="true" data-width="auto" data-style="btn-primary" data-size="10">
 				{% for mentor, projects in projects_by_mentor.items() %}
 					<optgroup label="{{ mentor }}">
@@ -40,10 +41,15 @@
 			</select>
 		</div>
 	</div>
+	</div>
 
 	{% block team_select %}
-		<div id="teamSelectDiv" class="row py-2 justify-content-center">
+		<div id="teamSelectDiv" class="row justify-content-center align-items-center text-center">
 		</div>
 	{% endblock %}
 </form>
+{% endblock %}
+{% block card_footer %}
+<div class="card-footer text-center">
+</div>
 {% endblock %}
