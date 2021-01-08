@@ -118,15 +118,17 @@ def projects():
             )
         )
 
-    pipeline = [
-        {'$group': {
+    pipeline = [{
+        '$group': {
             '_id': '$mentorName',
-            'projects': {'$push': {'name': '$name', '_id': '$_id'}}
-        }}
-    ]
+            'projects': {
+                '$push': {'name': '$name', '_id': '$_id'}
+            }
+        }
+    }]
 
     projects_collection = mongo.db.projects
-    docs = list(projects_collection.aggregate(pipeline))
+    docs = list(projects_collection.aggregate(pipeline, allowDiskUse=True))
     projects_by_mentor = {doc['_id']: doc['projects'] for doc in docs}
 
     # работает приблизительно в 5 раз быстрее, но требует дополнительной обработки

@@ -7,46 +7,69 @@
 	.dropdown-divider {
 		margin: 0.25rem 0;
 	}
+	@keyframes spinner-border {
+      to { transform: rotate(360deg); }
+    }
+    .spinner-border{
+        display: inline-block;
+        width: 3rem;
+        height: 3rem;
+        vertical-align: text-bottom;
+        border: .35em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: spinner-border .75s linear infinite;
+        animation: spinner-border .75s linear infinite;
+    }
+    .spinner-border-sm{
+        height: 1rem;
+        border-width: .2em;
+    }
 </style>
 {% endblock %}
-
+{% block title %} Запись {% endblock %}
 {% block card_body %}
 <form>
 	<div class="form-group row justify-content-between">
+		<div class="col-lg-12 col-sm-12">
 			<label for="fullName">ФИО</label>
 			<div class="form-control" id="fullName" readonly="">{{ data['fullName'] }}</div>
+		</div>
 	</div> <!-- form-group// -->
 
 	<div class="form-group row">
-		<label for="group">Учебная группа</label>
-		<div id="group" class="form-control" readonly="">{{ data['group'] }}</div>
+        <div class="col-12">
+			<label for="group">Учебная группа</label>
+			<div id="group" class="form-control" readonly="">{{ data['group'] }}</div>
+		</div>
 	 </div>
 
 	<div class="form-group row">
-		<label for="email">Электроная почта</label>
-		<div class="form-control" readonly="" id="email" >{{ data['email'] }}</div>
+		<div class="col-12">
+			<label for="email">Электроная почта</label>
+			<div class="form-control" readonly="" id="email" >{{ data['email'] }}</div>
+		</div>
 	</div> <!-- form-group// -->
 
 	<div class="row py-2 justify-content-center">
-        <div class="form-group">
-			<div class="col-12">
+		<div class="col-12">
 			<select id="projectSelect" class="selectpicker show-tick" data-width="500px" title="Выберите проект..." data-live-search="true" data-width="auto" data-style="btn-primary" data-size="10">
 				{% for mentor, projects in projects_by_mentor.items() %}
-					<optgroup label="{{ mentor }}">
-						{% for proj in projects %}
-							<option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
-						{% endfor %}
-					</optgroup>
+				<optgroup label="{{ mentor }}">
+					{% for proj in projects %}
+					<option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
+					{% endfor %}
+				</optgroup>
 				{% endfor %}
 			</select>
 		</div>
 	</div>
-	</div>
 
-	{% block team_select %}
-		<div id="teamSelectDiv" class="row justify-content-center align-items-center text-center">
+	<div class="row justify-content-center align-items-center">
+		<div class="col-12">
+			<div id="teamSelectDiv" class="row justify-content-center align-items-center text-center"></div>
 		</div>
-	{% endblock %}
+	</div>
 </form>
 {% endblock %}
 {% block card_footer %}
