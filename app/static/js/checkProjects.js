@@ -19,11 +19,11 @@ $(function() {
                         break;
                     case 'success':
                         dropdownToggleButton.css('background-color', originalDropdownSelectBackgroundColor);
-                        $('form').append('<div class="row justify-content-center" id="teamSelectDiv"></div>')
-                        let teamSelectDiv = $('#teamSelectDiv');
+                        $('form').children().last().prop('hidden', false);
 
+                        let teamSelectDiv = $(document).find('#teamSelectDiv');
                         teamSelectDiv.empty();
-                        teamSelectDiv.append('<select title="Выберите команду" data-width="500px" data-style="btn-primary" id="teamSelect" class="selectpicker show-tick"></select>');
+                        teamSelectDiv.html('<select title="Выберите команду" data-width="500px" data-style="btn-primary" id="teamSelect" class="selectpicker show-tick"></select>');
 
                         let teams = response.data.teams;
 
@@ -75,22 +75,38 @@ $(function() {
                     window.location = `/success?team_number=${data.teamNumber}&cell_index=${data.cellIndex}&project_name=${data.projectName}`
                     break;
                 case 'error':
+
                     let submitButton = $(document).find('#submit');
                     let cardFooter = $('.card-footer');
                     submitButton.remove('span');
                     submitButton.text('Записаться')
                     submitButton.removeClass('btn-success').addClass('btn-danger');
 
-                    cardFooter.text(response.message)
+                    let text = '';
+                    if (data.error_type === 'sheets') {
+                        text = 'Произошла ошибка при записи в сводную таблицу. Ваш ответ был сохранен в базе данных. Обратитесь к администратору с просьбой внести ваши данные в сводную таблицу';
+                    }
+                    else {
+                        text = response.message;
+                    }
+                    cardFooter.text(text);
+                    cardFooter.addClass('text-danger').addClass('font-weight-bold');
 
+                    if (data.details)
+                        console.log('Error details: ' + data.details);
+                    break;
             }
 
         }).fail(function (resp) {
-            console.error(resp);
+            console.error(resp.message, resp.details);
+
             let submitButton = $(document).find('#submit');
             submitButton.attr('disabled', true);
             submitButton.text('Ошибка');
-            $('.card-footer').text(resp.message).addClass('text-danger lead');
+            submitButton.removeClass('btn-success').addClass('btn-danger');
+
+            $('.card-footer').addClass('text-danger').addClass('font-weight-bold');
+            $('.card-footer').text('Произошла внутренняя ошибка сервера. ');
         });
     });
 });
