@@ -1,2 +1,2 @@
 #!/bin/bash
-gunicorn -w 3 run:app
+gunicorn -w 3 _app:app

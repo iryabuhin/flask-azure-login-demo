@@ -1,13 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Flask (exec.py:app)" type="Python.FlaskServer" nameIsGenerated="true">
+  <configuration default="false" name="Flask (_app.py:app)" type="Python.FlaskServer" nameIsGenerated="true">
     <option name="additionalOptions" value="--host=localhost --port=5000" />
     <option name="application" value="app" />
     <option name="flaskDebug" value="true" />
     <module name="flask-azure-aad-proicitis-demo" />
-    <option name="target" value="$PROJECT_DIR$/exec.py" />
+    <option name="target" value="$PROJECT_DIR$/_app.py" />
     <option name="targetType" value="PATH" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="FLAKS_APP" value="app.py" />
+    </envs>
     <option name="SDK_HOME" value="$PROJECT_DIR$/venv/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />

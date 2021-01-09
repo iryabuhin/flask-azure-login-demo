@@ -137,7 +137,7 @@ def projects():
     # profile_image_data = microsoft.get('me/photo/$value').data
     # image_b64 = b64encode(profile_image_data).decode('utf-8')
 
-    return render_template('project_select.html', data=student_data, projects_by_mentor=projects_by_mentor)
+    return render_template('projectSelect.html', data=student_data, projects_by_mentor=projects_by_mentor)
 
 
 @main.route('/success', methods=['GET'])
