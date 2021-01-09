@@ -1,14 +1,15 @@
-import pickle
 import os.path
 import re
 import string
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
+
+from apiclient import discovery
+from google.oauth2 import service_account
 from googleapiclient.discovery import Resource
-from google.auth.transport.requests import Request
+
 from typing import Dict, List, Optional, Any
-from json import JSONDecodeError
 from googleapiclient.errors import HttpError, Error
+from config import basedir
+
 
 TEAM_MAX_SIZE = 8
 GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_CREDENTIALS')
@@ -19,27 +20,9 @@ SCOPES =[
 
 
 def get_sheets_service() -> Resource:
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('sheets', 'v4', credentials=creds)
-
+    secret_file = os.path.join(basedir, GOOGLE_CREDENTIALS)
+    credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=SCOPES)
+    service = discovery.build('sheets', 'v4', credentials=credentials)
     return service
 
 
@@ -107,9 +90,11 @@ def sheets_write_to_cell(service: Resource, spreadsheet_id: str, cell: str, valu
             return {'status': 'success', 'result': result}
 
     except HttpError as e:
-        return {'status': 'error', 'error_name': 'http_error', 'details': e.error_details}
+        return {'status': 'error', 'message': 'Ошибка при установлении соединения с сервером',
+                'details': e.error_details}
     except Error as e:
-        return {'status': 'error', 'error_name': 'api_error', 'details': {'type': 'unknown'}}
+        return {'status': 'error', 'message': 'Произошла неизвестная ошибка',
+                'details': f'unknown error while writing to cell {cell} (spreadsheet_id={spreadsheet_id})'}
     except:
         raise
 
@@ -126,8 +111,8 @@ def sheets_team_add_member(value: str, team_cell_index: str, team_empty_slots: i
     try:
         row = str(squad.index(['']) + team_name_row + 1)
     except ValueError:
-        msg = "Cвободных мест в команде нет"
-        return {'status': 'error', 'result': msg}
+        msg = 'В выбранной команде нет свободных мест'
+        return {'status': 'error', 'message': msg}
     cell_index = col + row
 
     result = sheets_write_to_cell(service, os.environ.get('SPREADSHEET_ID'), cell_index, value)

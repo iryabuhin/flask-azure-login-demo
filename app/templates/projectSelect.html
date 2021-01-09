@@ -7,25 +7,9 @@
 	.dropdown-divider {
 		margin: 0.25rem 0;
 	}
-	@keyframes spinner-border {
-      to { transform: rotate(360deg); }
-    }
-    .spinner-border{
-        display: inline-block;
-        width: 3rem;
-        height: 3rem;
-        vertical-align: text-bottom;
-        border: .35em solid currentColor;
-        border-right-color: transparent;
-        border-radius: 50%;
-        -webkit-animation: spinner-border .75s linear infinite;
-        animation: spinner-border .75s linear infinite;
-    }
-    .spinner-border-sm{
-        height: 1rem;
-        border-width: .2em;
-    }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/spinner-border-my.css') }}">
 {% endblock %}
 {% block title %} Запись {% endblock %}
 {% block card_body %}
@@ -51,7 +35,7 @@
 		</div>
 	</div> <!-- form-group// -->
 
-	<div class="row py-2 justify-content-center">
+	<div class="row py-2 justify-content-center my-3">
 		<div class="col-12">
 			<select id="projectSelect" class="selectpicker show-tick" data-width="500px" title="Выберите проект..." data-live-search="true" data-width="auto" data-style="btn-primary" data-size="10">
 				{% for mentor, projects in projects_by_mentor.items() %}
@@ -65,7 +49,7 @@
 		</div>
 	</div>
 
-	<div class="row justify-content-center align-items-center">
+	<div class="row justify-content-center align-items-center my-3" hidden>
 		<div class="col-12">
 			<div id="teamSelectDiv" class="row justify-content-center align-items-center text-center"></div>
 		</div>
@@ -75,4 +59,8 @@
 {% block card_footer %}
 <div class="card-footer text-center">
 </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/checkProjects.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
 {% endblock %}
