@@ -1,65 +1,65 @@
 {% extends "card.html" %}
 {% block styles %}
-<style>
-	.card-body {
-		padding: 30px 40px;
-	}
+    <style>
+        .card-body {
+            padding: 30px 40px;
+        }
 
-	.dropdown-header {
-		padding: 0 1rem;
-	}
-	.dropdown-divider {
-		margin: 0.25rem 0;
-	}
+        .dropdown-header {
+            padding: 0 1rem;
+        }
+        .dropdown-divider {
+            margin: 0.25rem 0;
+        }
 
-	.border-grey {
-		border: 1px solid #ced4da;
-	}
-</style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/spinner-border-my.css') }}">
+        .border-grey {
+            border: 1px solid #ced4da;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spinner-border-my.css') }}">
 {% endblock %}
+
 {% block title %} Запись {% endblock %}
 {% block card_body %}
-<form>
-	<div class="form-group row">
-			<label for="fullName">ФИО</label>
-			<div class="form-control border border-grey" id="fullName" readonly="">{{ data['fullName'] }}</div>
-	</div> <!-- form-group// -->
+    <form>
+        <div class="form-group row">
+            <label for="fullName">ФИО</label>
+            <div class="form-control border border-grey" id="fullName" readonly="">{{ data['fullName'] }}</div>
+        </div> <!-- form-group// -->
 
-	<div class="form-group row">
-			<label for="group">Учебная группа</label>
-			<div id="group" class="form-control border border-grey" readonly="">{{ data['group'] }}</div>
-	 </div>
+        <div class="form-group row">
+            <label for="group">Учебная группа</label>
+            <div id="group" class="form-control border border-grey" readonly="">{{ data['group'] }}</div>
+        </div>
 
-	<div class="form-group row">
-			<label for="email">Электроная почта</label>
-			<div class="form-control border border-grey" readonly="" id="email" >{{ data['email'] }}</div>
-	</div> <!-- form-group// -->
+        <div class="form-group row">
+            <label for="email">Электроная почта</label>
+            <div class="form-control border border-grey" readonly="" id="email" >{{ data['email'] }}</div>
+        </div> <!-- form-group// -->
 
-	<div class="form-group row">
-			<label for="projectSelect">Проект</label>
-			<select id="projectSelect" class="selectpicker show-tick form-select" title="Выберите проект..." data-style="form-select border border-grey" data-live-search="true" data-width="100%" data-size="10">
-				{% for mentor, projects in projects_by_mentor.items() %}
-				<optgroup label="{{ mentor }}">
-					{% for proj in projects %}
-					<option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
-					{% endfor %}
-				</optgroup>
-				{% endfor %}
-			</select>
-	</div>
+        <div class="form-group row">
+            <label for="projectSelect">Проект</label>
+            <select id="projectSelect" class="selectpicker show-tick form-select" title="Выберите проект..." data-style="form-select border border-grey" data-live-search="true" data-width="100%" data-size="10">
+                {% for mentor, projects in projects_by_mentor.items() %}
+                    <optgroup label="{{ mentor }}">
+                        {% for proj in projects %}
+                            <option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
 
-	<div class="form-group row" id="teamSelectDiv" hidden>
-		</div>
-	</div>
-</form>
+        <div class="form-group row" id="teamSelectDiv" hidden>
+        </div>
+    </form>
 {% endblock %}
 {% block card_footer %}
 <div class="card-footer text-center">
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/checkProjects.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/checkProjects.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" integrity="sha512-yDlE7vpGDP7o2eftkCiPZ+yuUyEcaBwoJoIhdXv71KZWugFqEphIS3PU60lEkFaz8RxaVsMpSvQxMBaKVwA5xg==" crossorigin="anonymous"></script>
 {% endblock %}
