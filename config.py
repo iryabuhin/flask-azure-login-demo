@@ -24,6 +24,10 @@ class Config:
     MONGO_URI = os.environ.get('MONGO_URI') or os.environ.get('DATABASE_URI')
     MONGO_DBNAME = os.environ.get('MONGO_DBNAME')
 
+    STUDENT_GRADE_CHECK_ENABLED = os.environ.get('STUDENT_GRADE_CHECK_ENABLED') or False
+    STUDENT_GRADE_MAX = os.environ.get('STUDENT_GRADE_MAX') or 1
+
+
 
     @staticmethod
     def init_app(app):

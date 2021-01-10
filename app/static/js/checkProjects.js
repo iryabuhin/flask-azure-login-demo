@@ -6,24 +6,27 @@ $(function() {
     $(document).on('change', '#projectSelect', function () {
         let selectedProjectId = $(this).find(':selected').data('documentId');
         let cardFooter = $('.card-footer');
-        let dropdownToggleButton = $('.bootstrap-select > .dropdown-toggle');
+        let projectSelectButton = $('.bootstrap-select > .dropdown-toggle');
+        let teamSelectDiv = $(document).find('#teamSelectDiv');
 
         $.getJSON(`/api/projects/${selectedProjectId}/available`, {})
             .done(function (response) {
                 switch (response.status) {
                     case 'error':
-                        dropdownToggleButton.css('background-color', '#d9534f');
+                        projectSelectButton.removeClass('border-gray').addClass('border-danger').addClass('border-4');
 
+                        teamSelectDiv.prop('hidden', true);
                         cardFooter.empty();
-                        cardFooter.append(`<p class="lead text-danger font-weight-bold">${response.message}</p>`);
+                        cardFooter.append(`<p class="lead text-dark">${response.message}</p>`);
                         break;
                     case 'success':
-                        dropdownToggleButton.css('background-color', originalDropdownSelectBackgroundColor);
-                        $('form').children().last().prop('hidden', false);
+                        projectSelectButton.removeClass('border-danger').addClass('border-gray');
 
-                        let teamSelectDiv = $(document).find('#teamSelectDiv');
-                        teamSelectDiv.empty();
-                        teamSelectDiv.html('<select title="Выберите команду" data-width="500px" data-style="btn-primary" id="teamSelect" class="selectpicker show-tick"></select>');
+                        teamSelectDiv.prop('hidden', false);
+                        teamSelectDiv.append('<label for="#teamSelect">Команда</label>');
+                        teamSelectDiv.append(
+                            '<select id="teamSelect" class="selectpicker show-tick" title="Выберите команду" data-width="100%" data-style="border border-grey" ></select>'
+                        );
 
                         let teams = response.data.teams;
 
@@ -31,10 +34,10 @@ $(function() {
                             $('#teamSelect').append(`<option>${team.name} (свободных мест: ${team.emptySlots.toString()})</option>`);
                         });
 
-                        $('.selectpicker').selectpicker();
-                        // let cardFooter = $('.card-footer');
+                        $('.selectpicker').selectpicker('refresh');
+
                         cardFooter.empty()
-                        cardFooter.append('<button type="submit" id="submit" class="btn btn-lg btn-success">Записаться</button>');
+                        cardFooter.html('<button type="submit" id="submit" class="btn btn-lg btn-primary" disabled>Записаться</button>');
 
                         break;
                 }
@@ -44,11 +47,17 @@ $(function() {
             });
     });
 
+    $(document).on('change', '#teamSelect', function () {
+        if ($(this).val() !== '') {
+            $(document).find('#submit').removeAttr('disabled');
+        }
+    });
+
     $(document).on('click', '#submit', function (event) {
         event.preventDefault();
 
-        if (!$(document).find('#teamSelect') || $('#teamSelect').val() === 'default') {
-            return;
+        if (!$(document).find('#teamSelect') || $('#teamSelect').val() === '') {
+            $(this);
         }
 
         $(this).prop('disabled', true);

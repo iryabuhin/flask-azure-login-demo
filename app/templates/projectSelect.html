@@ -1,11 +1,19 @@
 {% extends "card.html" %}
 {% block styles %}
 <style>
+	.card-body {
+		padding: 30px 40px;
+	}
+
 	.dropdown-header {
 		padding: 0 1rem;
 	}
 	.dropdown-divider {
 		margin: 0.25rem 0;
+	}
+
+	.border-grey {
+		border: 1px solid #ced4da;
 	}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
@@ -14,30 +22,24 @@
 {% block title %} Запись {% endblock %}
 {% block card_body %}
 <form>
-	<div class="form-group row justify-content-between">
-		<div class="col-lg-12 col-sm-12">
+	<div class="form-group row">
 			<label for="fullName">ФИО</label>
-			<div class="form-control" id="fullName" readonly="">{{ data['fullName'] }}</div>
-		</div>
+			<div class="form-control border border-grey" id="fullName" readonly="">{{ data['fullName'] }}</div>
 	</div> <!-- form-group// -->
 
 	<div class="form-group row">
-        <div class="col-12">
 			<label for="group">Учебная группа</label>
-			<div id="group" class="form-control" readonly="">{{ data['group'] }}</div>
-		</div>
+			<div id="group" class="form-control border border-grey" readonly="">{{ data['group'] }}</div>
 	 </div>
 
 	<div class="form-group row">
-		<div class="col-12">
 			<label for="email">Электроная почта</label>
-			<div class="form-control" readonly="" id="email" >{{ data['email'] }}</div>
-		</div>
+			<div class="form-control border border-grey" readonly="" id="email" >{{ data['email'] }}</div>
 	</div> <!-- form-group// -->
 
-	<div class="row py-2 justify-content-center my-3">
-		<div class="col-12">
-			<select id="projectSelect" class="selectpicker show-tick" data-width="500px" title="Выберите проект..." data-live-search="true" data-width="auto" data-style="btn-primary" data-size="10">
+	<div class="form-group row">
+			<label for="projectSelect">Проект</label>
+			<select id="projectSelect" class="selectpicker show-tick form-select" title="Выберите проект..." data-style="form-select border border-grey" data-live-search="true" data-width="100%" data-size="10">
 				{% for mentor, projects in projects_by_mentor.items() %}
 				<optgroup label="{{ mentor }}">
 					{% for proj in projects %}
@@ -46,12 +48,9 @@
 				</optgroup>
 				{% endfor %}
 			</select>
-		</div>
 	</div>
 
-	<div class="row justify-content-center align-items-center my-3" hidden>
-		<div class="col-12">
-			<div id="teamSelectDiv" class="row justify-content-center align-items-center text-center"></div>
+	<div class="form-group row" id="teamSelectDiv" hidden>
 		</div>
 	</div>
 </form>

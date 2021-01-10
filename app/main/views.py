@@ -102,8 +102,17 @@ def projects():
     if email is None:
         email = me.get('givenName')
 
-    # TODO добавить проверку на первый/второй курс
     student_data = get_student_data(email)
+
+
+    if current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
+        if student_data['levelLearn'].lower() not in ['специалист', 'бакалавр'] \
+                or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
+            return render_template(
+                'error.html',
+                error_header='Ошибка',
+                error_message='Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
+            )
 
     doc = mongo.db.projects.find_one(
         filter={'teams.members.fullName': student_data['fullName']},
