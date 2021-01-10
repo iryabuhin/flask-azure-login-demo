@@ -20,7 +20,13 @@ def get_student_data(email: str) -> Dict[str, str]:
         )
     )
 
-    data = json.loads(response.text)['student']
+    data = response.json()
+
+    if data.get('student') is None:
+        return {}
+
+    data = data['student']
+
     group = '{}{}-{}'.format(
         STUDY_LEVEL_NAMES[data['levelLearn']],
         data['grade'],

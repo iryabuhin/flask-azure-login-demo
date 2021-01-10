@@ -114,21 +114,33 @@ def projects():
     if email is None:
         email = me.get('givenName')
 
+    error_occurred = False
+    error_message = error_header = ''
+
     student_data = get_student_data(email)
+
+    if not student_data:
+        error_occurred = True
+        error_header = 'Ошибка'
+        error_message = 'Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
 
     if current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
         if student_data['levelLearn'].lower() not in ['специалист', 'бакалавр'] \
                 or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
-            return render_template(
-                'error.html',
-                error_header='Ошибка',
-                error_message='Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
-            )
+            error_occurred = True
+
+    if error_occurred:
+        return render_template(
+            'error.html',
+            error_header=error_header,
+            error_message=error_message
+        )
 
     doc = mongo.db.projects.find_one(
         filter={'teams.members.fullName': student_data['fullName']},
         projection={'name': 1, 'teams.name': 1}
     )
+
     if doc:
         return render_template(
             'error.html',
