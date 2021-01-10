@@ -12,8 +12,8 @@ from config import basedir
 
 
 TEAM_MAX_SIZE = 8
-GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_CREDENTIALS')
-SCOPES =[
+GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
 ]
