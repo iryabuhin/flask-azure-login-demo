@@ -8,11 +8,12 @@ from . import main
 from .. import microsoft
 from .ictis_api import get_student_data
 from app import mongo
+from app import cache
 from flask_required_args import required_data
 from pymongo import CursorType
 
 
-# @cache.cached(timeout=15, key_prefix='projects_by_mentor')
+@cache.cached(timeout=5*60, key_prefix='projects_by_mentor')
 def get_projects_by_mentor() -> Dict[str, List[Dict[str, str]]]:
     result = dict()
     pipeline = [{'$group': {'_id': '$mentorName', 'projects': {'$push': {'name': '$name', '_id': '$_id'}}}}]
@@ -123,7 +124,7 @@ def projects():
         error_header = 'Ошибка'
         error_message = 'Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
 
-    if current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
+    if not error_occurred and current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
         if student_data['levelLearn'].lower() not in ['специалист', 'бакалавр'] \
                 or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
             error_occurred = True
