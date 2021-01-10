@@ -8,12 +8,11 @@ from . import main
 from .. import microsoft
 from .ictis_api import get_student_data
 from app import mongo
-from app import cache
 from flask_required_args import required_data
 from pymongo import CursorType
 
 
-@cache.cached(timeout=5*60, key_prefix='projects_by_mentor')
+# @cache.cached(timeout=15, key_prefix='projects_by_mentor')
 def get_projects_by_mentor() -> Dict[str, List[Dict[str, str]]]:
     result = dict()
     pipeline = [{'$group': {'_id': '$mentorName', 'projects': {'$push': {'name': '$name', '_id': '$_id'}}}}]
