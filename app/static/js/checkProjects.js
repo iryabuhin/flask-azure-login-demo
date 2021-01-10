@@ -15,6 +15,7 @@ $(function() {
                     case 'error':
                         projectSelectButton.removeClass('border-gray').addClass('border-danger').addClass('border-4');
 
+                        teamSelectDiv.empty();
                         teamSelectDiv.prop('hidden', true);
                         cardFooter.empty();
                         cardFooter.append(`<p class="lead text-dark">${response.message}</p>`);
@@ -22,9 +23,10 @@ $(function() {
                     case 'success':
                         projectSelectButton.removeClass('border-danger').addClass('border-gray');
 
+                        teamSelectDiv.empty();
                         teamSelectDiv.prop('hidden', false);
-                        teamSelectDiv.append('<label for="#teamSelect">Команда</label>');
-                        teamSelectDiv.append(
+                        teamSelectDiv.html(
+                            '<label for="#teamSelect">Команда</label>' +
                             '<select id="teamSelect" class="selectpicker show-tick" title="Выберите команду" data-width="100%" data-style="border border-grey" ></select>'
                         );
 
