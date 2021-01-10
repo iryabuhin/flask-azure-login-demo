@@ -131,6 +131,6 @@ def join_project(id: str, name: str, group: str, team: str):
             'projectName': updated_document['name']
         })
     elif insert_result['status'] == 'error':
-        return error(message=insert_result['message'], data={'error_type': 'sheets', 'details': insert_result['details']})
+        return error(message=insert_result['message'])
 
     return error('insertion failed due to an unknown error')
