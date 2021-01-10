@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Union, List
 from flask import jsonify, request, current_app, url_for, redirect, render_template, Response
 from . import api
-from app import mongo
+from app import mongo, cache
 from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError, OperationFailure
 from pymongo import ReturnDocument
@@ -69,6 +69,7 @@ def get_by_name_proj(query: str):
 
 
 @api.route('/api/projects/<id>/available', methods=['GET'])
+@cache.cached(15)
 def check_project_availability(id: str):
     proj = get_project_by_id(id)
 

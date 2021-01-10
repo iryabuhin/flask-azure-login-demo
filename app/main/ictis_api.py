@@ -4,10 +4,12 @@ import requests
 from requests.auth import HTTPBasicAuth
 from flask import current_app
 import json
+from app import cache
 
 STUDY_LEVEL_NAMES = {'Специалист': 'КТсо', 'Бакалавр': 'КТбо'}
 
 
+@cache.memoize(timeout=5*60)
 def get_student_data(email: str) -> Dict[str, str]:
     response = requests.get(
         current_app.config['ICTIS_API_URL'],

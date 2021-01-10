@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 token.pickle
-credentials.json
-credentials.json
+google-credentials.json
+google-credentials.json
 client_secret.json
 google-credentials.json
 vendor/
@@ -145,6 +145,7 @@ cython_debug/
 
 .DS_Store
 .env
+.env.bak
 ./app/main/google-credentials.json
 google-credentials.json
 .flaskenv

@@ -2,12 +2,14 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_oauthlib.client import OAuth, OAuthException
 from flask_pymongo import PyMongo
+from flask_caching import Cache
 from config import config
 import os
 
 bootstrap = Bootstrap()
 oauth = OAuth()
 mongo = PyMongo()
+cache = Cache()
 
 tenant_name = os.getenv('APP_AAD_TENANT')
 microsoft = oauth.remote_app(
@@ -30,6 +32,11 @@ def create_app(config_name: str):
     bootstrap.init_app(app)
     oauth.init_app(app)
     mongo.init_app(app)
+    cache.init_app(app, config={
+        'CACHE_TYPE': app.config['CACHE_TYPE'],
+        'CACHE_REDIS_URL': app.config['CACHE_REDIS_URL'],
+        'CACHE_DEFAULT_TIMEOUT': app.config['CACHE_DEFAULT_TIMEOUT']
+    })
 
     if app.config['SSL_REDIRECT']:
         from flask_sslify import SSLify

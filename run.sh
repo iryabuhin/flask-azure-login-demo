@@ -1,2 +1,3 @@
 #!/bin/bash
-gunicorn -w 3 _app:app
+source venv/bin/activate
+exec gunicorn -b :5000 -w 3 --access-logfile - --error-logfile - _app:app

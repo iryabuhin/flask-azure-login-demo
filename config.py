@@ -14,7 +14,7 @@ class Config:
 
     BASE_GRAPH_API_URL = 'https://graph.microsoft.com/v1.0/'
 
-    GOOGLE_CREDENTIALS = os.path.join(basedir, 'credentials.json')
+    GOOGLE_CREDENTIALS = 'google-credentials.json'
     SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 
     ICTIS_API_URL = os.environ.get('ICTIS_API_URL')
@@ -26,6 +26,10 @@ class Config:
 
     STUDENT_GRADE_CHECK_ENABLED = os.environ.get('STUDENT_GRADE_CHECK_ENABLED') or False
     STUDENT_GRADE_MAX = os.environ.get('STUDENT_GRADE_MAX') or 1
+
+    CACHE_TYPE = os.environ.get('CACHE_TYPE', 'redis')
+    CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or os.environ.get('REDIS_URL', 'redis://localhost:6379')
+    CACHE_DEFAULT_TIMEOUT = 5 * 60
 
 
 
