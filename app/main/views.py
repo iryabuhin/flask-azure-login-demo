@@ -72,16 +72,17 @@ def login():
         return redirect(url_for('.projects'))
 
     # Generate the guid to only accept initiated logins
-    guid = str(uuid.uuid4())
-    session['state'] = guid
+    # guid = str(uuid.uuid4())
+    # session['state'] = guid
 
-    return microsoft.authorize(callback=url_for('.authorized', _external=True), state=guid)
+    # return microsoft.authorize(callback=url_for('.authorized', _external=True), state=guid)
+    return microsoft.authorize(callback=url_for('.authorized', _external=True))
 
 
 @main.route('/logout', methods=['POST', 'GET'])
 def logout():
     session.pop('microsoft_token', None)
-    session.pop('state', None)
+    # session.pop('state', None)
     return redirect(url_for('.index'))
 
 
@@ -90,14 +91,11 @@ def authorized():
     response = microsoft.authorized_response()
 
     if response is None:
-        return "Access Denied: Reason=%s\nError=%s" % (
-            response.get('error'),
-            request.get('error_description')
-        )
+        return 'no response received from microsoft, context: ' + 'Args: ' + ' '.join(request.args)
 
     # Check response for state
-    if str(session['state']) != str(request.args['state']):
-        raise Exception('State has been messed with, end authentication')
+    # if str(session['state']) != str(request.args['state']):
+    #     raise Exception('State has been messed with, end authentication')
 
     session['microsoft_token'] = (response['access_token'], '')
     session['expires_at'] = datetime.now() + timedelta(seconds=int(response['expires_in']))
