@@ -1,7 +1,7 @@
 {% extends "error.html" %}
-{% block error_code %}Ой, 500{%block error_code %}
+{% block error_code %}500{% endblock %}
 {% block error %}
-<p class="lead">Что-то сломалось. Но мы это обязательно починим!</p>
+<p class="lead">Произошла внутренняя ошибка сервера</p>
 <hr>
 <p class="lead"><a href="{{ url_for('main.index') }}">Вернуться на главную</a> </p>
 {% endblock %}

@@ -44,7 +44,7 @@
                 {% for mentor, projects in projects_by_mentor.items() %}
                     <optgroup label="{{ mentor }}">
                         {% for proj in projects %}
-                            <option data-icon="circle" data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
+                            <option data-document-id="{{ proj['_id'] }}">{{ proj['name'] | safe }}</option>
                         {% endfor %}
                     </optgroup>
                 {% endfor %}

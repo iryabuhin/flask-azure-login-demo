@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 from . import main
 from .. import microsoft
-from .ictis_api import get_student_data
+from .ictis_api import get_student_data, STUDY_LEVEL_NAMES
 from app import mongo
 from app import cache
 from flask_required_args import required_data
@@ -125,7 +125,7 @@ def projects():
         error_message = 'Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
 
     if not error_occurred and current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
-        if student_data['levelLearn'].lower() not in ['специалист', 'бакалавр'] \
+        if student_data['levelLearn'].lower() not in STUDY_LEVEL_NAMES.keys() \
                 or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
             error_occurred = True
 

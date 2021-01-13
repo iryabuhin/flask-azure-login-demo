@@ -3,13 +3,16 @@ from typing import Dict
 import requests
 from requests.auth import HTTPBasicAuth
 from flask import current_app
-import json
 from app import cache
 
-STUDY_LEVEL_NAMES = {'Специалист': 'КТсо', 'Бакалавр': 'КТбо'}
+STUDY_LEVEL_NAMES = {
+    'специалист': 'КТсо',
+    'бакалавр': 'КТбо',
+    'прикладной бакалавр': 'КТбо'
+}
 
 
-@cache.memoize(timeout=5*60)
+# @cache.memoize(timeout=15*60)
 def get_student_data(email: str) -> Dict[str, str]:
     response = requests.get(
         current_app.config['ICTIS_API_URL'],
@@ -22,13 +25,14 @@ def get_student_data(email: str) -> Dict[str, str]:
 
     data = response.json()
 
-    if data.get('student') is None:
+    if data.get('student') is None or \
+            data.get('student').get('levelLearn').lower() not in STUDY_LEVEL_NAMES.keys():
         return {}
 
     data = data['student']
 
     group = '{}{}-{}'.format(
-        STUDY_LEVEL_NAMES[data['levelLearn']],
+        STUDY_LEVEL_NAMES[data.get('levelLearn').lower()],
         data['grade'],
         data['stGroup']
     )

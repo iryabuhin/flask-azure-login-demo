@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_oauthlib.client import OAuth, OAuthException
+from flask_fontawesome import FontAwesome
 from flask_pymongo import PyMongo
 from flask_caching import Cache
 from config import config
@@ -24,7 +25,8 @@ microsoft = oauth.remote_app(
     authorize_url=f'https://login.microsoftonline.com/{tenant_name}/oauth2/v2.0/authorize'
 )
 
-def create_app(config_name: str):
+
+def create_app(config_name: str) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
@@ -32,6 +34,7 @@ def create_app(config_name: str):
     bootstrap.init_app(app)
     oauth.init_app(app)
     mongo.init_app(app)
+    FontAwesome(app)
     cache.init_app(app, config={
         'CACHE_TYPE': app.config['CACHE_TYPE'],
         'CACHE_REDIS_URL': app.config['CACHE_REDIS_URL'],
