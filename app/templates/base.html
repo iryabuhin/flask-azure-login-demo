@@ -24,15 +24,21 @@
     <body>
     {% block navbar %}
     {% from "bootstrap/nav.html" import render_nav_item %}
-    <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
+    <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark justify-content-between">
         <a class="navbar-brand" href="{{ url_for('main.index') }}">
             <img src="{{ url_for('static', filename='images/logo_proictis_light.png') }}" width="150" height="35" class="d-inline-block align-top" alt="logo proictis">
         </a>
-        <div class="navbar-nav mr-auto">
-            {{ render_nav_item('main.projects', 'Записаться на проект') }}
-        </div>
-        <div class="navbar-nav ml-auto">
-            {{ render_nav_item('main.logout', 'Выйти') }}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarDropdown" aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarDropdown">
+            <div class="navbar-nav mr-auto">
+                {{ render_nav_item('main.projects', 'Записаться на проект') }}
+            </div>
+            <div class="navbar-nav ml-auto">
+                {{ render_nav_item('main.logout', 'Выйти') }}
+            </div>
         </div>
     </nav>
     {% endblock %}

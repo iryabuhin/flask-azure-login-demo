@@ -1,1 +1,1 @@
-web: gunicorn run:app
+web: gunicorn -w 3 --access-logfile - --error-logfile - _app:app

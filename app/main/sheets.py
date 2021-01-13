@@ -12,8 +12,8 @@ from config import basedir
 
 
 TEAM_MAX_SIZE = 8
-GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_CREDENTIALS')
-SCOPES =[
+GOOGLE_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive'
 ]
@@ -21,6 +21,12 @@ SCOPES =[
 
 def get_sheets_service() -> Resource:
     secret_file = os.path.join(basedir, GOOGLE_CREDENTIALS)
+    # DEBUG
+    if not os.path.exists(secret_file):
+        print('ERROR: No google-credentials.json file found!')
+        print('Calculated path to credentials file: ' + secret_file)
+        raise FileNotFoundError
+
     credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=SCOPES)
     service = discovery.build('sheets', 'v4', credentials=credentials)
     return service

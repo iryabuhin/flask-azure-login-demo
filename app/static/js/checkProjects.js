@@ -15,6 +15,7 @@ $(function() {
                     case 'error':
                         projectSelectButton.removeClass('border-gray').addClass('border-danger').addClass('border-4');
 
+                        teamSelectDiv.empty();
                         teamSelectDiv.prop('hidden', true);
                         cardFooter.empty();
                         cardFooter.append(`<p class="lead text-dark">${response.message}</p>`);
@@ -22,9 +23,10 @@ $(function() {
                     case 'success':
                         projectSelectButton.removeClass('border-danger').addClass('border-gray');
 
+                        teamSelectDiv.empty();
                         teamSelectDiv.prop('hidden', false);
-                        teamSelectDiv.append('<label for="#teamSelect">Команда</label>');
-                        teamSelectDiv.append(
+                        teamSelectDiv.html(
+                            '<label for="#teamSelect">Команда</label>' +
                             '<select id="teamSelect" class="selectpicker show-tick" title="Выберите команду" data-width="100%" data-style="border border-grey" ></select>'
                         );
 
@@ -80,42 +82,37 @@ $(function() {
             let data = response.data;
             switch (response.status) {
                 case 'success':
-                    $.ajax('/success')
                     window.location = `/success?team_number=${data.teamNumber}&cell_index=${data.cellIndex}&project_name=${data.projectName}`
                     break;
                 case 'error':
-
                     let submitButton = $(document).find('#submit');
                     let cardFooter = $('.card-footer');
                     submitButton.remove('span');
                     submitButton.text('Записаться')
                     submitButton.removeClass('btn-success').addClass('btn-danger');
 
-                    let text = '';
-                    if (data.error_type === 'sheets') {
-                        text = 'Произошла ошибка при записи в сводную таблицу. Ваш ответ был сохранен в базе данных. Обратитесь к администратору с просьбой внести ваши данные в сводную таблицу';
-                    }
-                    else {
-                        text = response.message;
-                    }
-                    cardFooter.text(text);
+                    cardFooter.text(response.message);
                     cardFooter.addClass('text-danger').addClass('font-weight-bold');
 
-                    if (data.details)
-                        console.log('Error details: ' + data.details);
                     break;
             }
 
         }).fail(function (resp) {
-            console.error(resp.message, resp.details);
-
             let submitButton = $(document).find('#submit');
             submitButton.attr('disabled', true);
             submitButton.text('Ошибка');
             submitButton.removeClass('btn-success').addClass('btn-danger');
 
+            let text = '';
+            if (resp.message) {
+                text = resp.message;
+            }
+            else {
+                text = 'Произошла внутренняя ошибка сервера';
+            }
+
             $('.card-footer').addClass('text-danger').addClass('font-weight-bold');
-            $('.card-footer').text('Произошла внутренняя ошибка сервера. ');
+            $('.card-footer').text(text);
         });
     });
 });
