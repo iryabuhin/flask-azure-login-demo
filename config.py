@@ -38,9 +38,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
-
-
-
+    PROJECT_REGISTRATION_DISABLED = bool(os.environ.get('PROJECT_REGISTRATION_DISABLED'))
 
     @staticmethod
     def init_app(app):

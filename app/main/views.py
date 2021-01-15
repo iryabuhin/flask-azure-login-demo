@@ -123,9 +123,22 @@ def authorized():
     return redirect(url_for('.projects'))
 
 
+def render_error_template(error_header: str, error_message: str, **kwargs):
+    return render_template(
+        'error.html',
+        error_header=error_header,
+        error_message=error_message,
+        **kwargs
+    )
+
+
 @main.route('/projects')
 @login_required
 def projects():
+
+    if current_app.config['PROJECT_REGISTRATION_DISABLED']:
+        return render_error_template('Запись закрыта', 'Запись на творческие проекты в данный момент закрыта.', show_logout=True)
+
     me = microsoft.get('me').data
     email = me.get('mail')
 
@@ -138,22 +151,15 @@ def projects():
 
     student_data = get_student_data(email)
 
-    if not student_data:
+    if not student_data \
+            or student_data['levelLearn'].lower() not in STUDY_LEVEL_NAMES.keys() \
+            or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
         error_occurred = True
         error_header = 'Ошибка'
         error_message = 'Запись открыта только для студентов первого курса ИКТИБ ИТА ЮФУ'
 
-    if not error_occurred and current_app.config['STUDENT_GRADE_CHECK_ENABLED']:
-        if student_data['levelLearn'].lower() not in STUDY_LEVEL_NAMES.keys() \
-                or int(student_data['grade']) > int(current_app.config['STUDENT_GRADE_MAX']):
-            error_occurred = True
-
     if error_occurred:
-        return render_template(
-            'error.html',
-            error_header=error_header,
-            error_message=error_message
-        )
+        return render_error_template(error_header, error_message, show_logout=True)
 
     doc = mongo.db.projects.find_one(
         filter={'teams.members.fullName': student_data['fullName']},
@@ -161,13 +167,11 @@ def projects():
     )
 
     if doc:
-        return render_template(
-            'error.html',
-            error_header='Вы уже записаны на проект',
-            error_message='Вы уже записаны на творческий проект "{}"'.format(
-                doc['name'],
+        return render_error_template(
+            'Вы уже записаны на проект',
+            'Вы уже записаны на творческий проект "{}"'.format(doc.get('name')),
+            show_logout=True
             )
-        )
 
     projects_by_mentor = get_projects_by_mentor()
 
