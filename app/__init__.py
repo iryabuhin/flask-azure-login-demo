@@ -1,10 +1,12 @@
+import logging
+from logging.handlers import SMTPHandler
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_oauthlib.client import OAuth, OAuthException
 from flask_fontawesome import FontAwesome
 from flask_pymongo import PyMongo
 from flask_caching import Cache
-from flask_errormail import mail_on_500
+from flask_mail import Mail, Message
 from config import config
 import os
 
@@ -12,7 +14,7 @@ bootstrap = Bootstrap()
 oauth = OAuth()
 mongo = PyMongo()
 cache = Cache()
-
+mail = Mail()
 tenant_name = os.getenv('APP_AAD_TENANT')
 microsoft = oauth.remote_app(
     'microsoft',
@@ -36,6 +38,7 @@ def create_app(config_name: str) -> Flask:
     oauth.init_app(app)
     mongo.init_app(app)
     FontAwesome(app)
+    mail.init_app(app)
 
     cache.init_app(app, config={
         'CACHE_TYPE': app.config['CACHE_TYPE'],
@@ -52,9 +55,25 @@ def create_app(config_name: str) -> Flask:
 
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint)
-    # отправка сообщений об ошибках по почте
-    mail_on_500(
-        app,
-        app.config['ADMIN_EMAIL']
-    )
+
+    app.debug = False
+    if not app.debug and not app.testing:
+        if app.config['MAIL_SERVER']:
+            auth = None
+            if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
+                auth = (app.config['MAIL_USERNAME'],
+                        app.config['MAIL_PASSWORD'])
+            secure = None
+            if app.config.get('MAIL_USE_TLS') or app.config.get('MAIL_USE_SSL'):
+                secure = ()
+            mail_handler = SMTPHandler(
+                mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+                fromaddr='no-reply@' + app.config['MAIL_SERVER'],
+                toaddrs=app.config['ADMIN_EMAIL'], subject='Ошибка в приложении',
+                credentials=auth, secure=secure)
+            mail_handler.setLevel(logging.ERROR)
+            app.logger.addHandler(mail_handler)
+
+        app.logger.setLevel(logging.INFO)
+
     return app

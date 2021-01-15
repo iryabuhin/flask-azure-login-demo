@@ -26,18 +26,17 @@
     <body>
     {% block navbar %}
     {% from "bootstrap/nav.html" import render_nav_item %}
-    <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark justify-content-between">
+    <nav class="navbar sticky-top navbar-fixed-top navbar-dark bg-dark justify-content-between">
         <a class="navbar-brand" href="https://vk.com/proictis" target="_blank">
             <img src="{{ url_for('static', filename='images/logo_proictis_light.png') }}" width="130" class="d-inline-block align-top" alt="логотип Проектного офиса">
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarDropdown" aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarDropdown">
-            <div class="navbar-nav ml-auto">
-                {{ render_nav_item('main.logout', 'Выйти') }}
-            </div>
-        </div>
+        {% if show_logout is defined %}
+            {%  if show_logout is true %}
+                <div class="navbar-nav ml-auto">
+                    {{ render_nav_item('main.logout', 'Выйти') }}
+                </div>
+            {% endif %}
+        {% endif %}
     </nav>
     {% endblock %}
     <!-- Your page content -->

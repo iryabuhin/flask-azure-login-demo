@@ -46,14 +46,22 @@ def login_required(f):
             response = (microsoft.post(microsoft.access_token_url, data=data)).data
 
             if response is None:
+                raise OAuthException
+            elif response.get('error'):
                 session.clear()
-                print(
-                    "Access Denied: Reason={}\nError={}".format(
+
+                current_app.logger.error(
+                    "Azure Access Denied: Reason={}\nError={}".format(
                         response.get('error'),
-                        request.get('error_description')
+                        response.get('error_description')
                     )
                 )
-                return redirect(url_for('.index'))
+
+                return render_template(
+                    'error.html',
+                    error_header=response.get('error'),
+                    error_message=response.get('error_description')
+                )
             else:
                 session['microsoft_token'] = (response['access_token'], '')
                 session['expires_at'] = datetime.now() + timedelta(seconds=int(response['expires_in']))
@@ -64,7 +72,11 @@ def login_required(f):
 
 @main.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    show_logout = None
+    if 'microsoft_token' in session:
+        show_logout = True
+
+    return render_template('index.html', show_logout=show_logout)
 
 
 @main.route('/login', methods=['POST', 'GET'])
@@ -93,7 +105,12 @@ def authorized():
 
     if response is None:
         current_app.logger.error('No response received from microsoft, context: ' + 'Args: ' + ' '.join(request.args))
-        abort(500)
+        return render_template(
+            'error.html',
+            error_header='Ошибка авторизации Microsoft',
+            error_message='При попытке авторизации произошла ошибка. Попробуйте выйти и затем снова авторизоваться.',
+            show_logout=True
+        )
 
     # Check response for state
     # if str(session['state']) != str(request.args['state']):
@@ -160,7 +177,7 @@ def projects():
     # profile_image_data = microsoft.get('me/photo/$value').data
     # image_b64 = b64encode(profile_image_data).decode('utf-8')
 
-    return render_template('projectSelect.html', data=student_data, projects_by_mentor=projects_by_mentor)
+    return render_template('projectSelect.html', data=student_data, projects_by_mentor=projects_by_mentor, show_logout=True)
 
 
 @main.route('/success', methods=['GET'])
@@ -182,7 +199,8 @@ def after_successful_team_join():
         cell_index=cell_index,
         project_name=project_name,
         team_number=team_number,
-        sheet_url=sheet_url
+        sheet_url=sheet_url,
+        show_logout=True
     )
 
 
