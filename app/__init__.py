@@ -4,6 +4,7 @@ from flask_oauthlib.client import OAuth, OAuthException
 from flask_fontawesome import FontAwesome
 from flask_pymongo import PyMongo
 from flask_caching import Cache
+from flask_errormail import mail_on_500
 from config import config
 import os
 
@@ -35,6 +36,7 @@ def create_app(config_name: str) -> Flask:
     oauth.init_app(app)
     mongo.init_app(app)
     FontAwesome(app)
+
     cache.init_app(app, config={
         'CACHE_TYPE': app.config['CACHE_TYPE'],
         'CACHE_REDIS_URL': app.config['CACHE_REDIS_URL'],
@@ -50,5 +52,9 @@ def create_app(config_name: str) -> Flask:
 
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint)
-
+    # отправка сообщений об ошибках по почте
+    mail_on_500(
+        app,
+        app.config['ADMIN_EMAIL']
+    )
     return app

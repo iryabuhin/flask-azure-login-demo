@@ -10,6 +10,7 @@ from .ictis_api import get_student_data, STUDY_LEVEL_NAMES
 from app import mongo
 from app import cache
 from flask_required_args import required_data
+from flask_oauthlib.client import OAuthException
 from pymongo import CursorType
 
 
@@ -91,7 +92,8 @@ def authorized():
     response = microsoft.authorized_response()
 
     if response is None:
-        return 'no response received from microsoft, context: ' + 'Args: ' + ' '.join(request.args)
+        current_app.logger.error('No response received from microsoft, context: ' + 'Args: ' + ' '.join(request.args))
+        abort(500)
 
     # Check response for state
     # if str(session['state']) != str(request.args['state']):

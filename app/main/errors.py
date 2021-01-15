@@ -1,4 +1,5 @@
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, current_app
+from flask_oauthlib.client import OAuthException
 from . import main
 
 
@@ -27,6 +28,16 @@ def internal_server_error(e):
     if request.accept_mimetypes.accept_json and \
             not request.accept_mimetypes.accept_html:
         response = jsonify({'error': 'internal server error'})
+        response.status_code = 500
+        return response
+    return render_template('500.html'), 500
+
+
+@main.app_errorhandler(OAuthException)
+def azure_auth_error(e):
+    if request.accept_mimetypes.accept_json and \
+            not request.accept_mimetypes.accept_html:
+        response = jsonify({'error': 'internal server error', 'message': e.message, 'data': e.data})
         response.status_code = 500
         return response
     return render_template('500.html'), 500

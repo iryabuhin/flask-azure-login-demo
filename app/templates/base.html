@@ -8,6 +8,7 @@
             <!-- Bootstrap CSS -->
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" integrity="sha512-ARJR74swou2y0Q2V9k0GbzQ/5vJ2RBSoCWokg4zkfM29Fb3vZEQyv0iWBMW/yvKgyHSR/7D64pFMmU8nYmbRkg==" crossorigin="anonymous" />
+            <link rel="shortcut icon" href="{{  url_for('static', filename='images/favicon.png') }}">
             {{ fontawesome_css() }}
         {% block styles %}
         {% endblock %}
@@ -26,18 +27,13 @@
     {% block navbar %}
     {% from "bootstrap/nav.html" import render_nav_item %}
     <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark justify-content-between">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='images/logo_proictis_light.png') }}" width="114" height="30" class="d-inline-block align-top" alt="logo proictis">
+        <a class="navbar-brand" href="https://vk.com/proictis" target="_blank">
+            <img src="{{ url_for('static', filename='images/logo_proictis_light.png') }}" width="130" class="d-inline-block align-top" alt="логотип Проектного офиса">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarDropdown" aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarDropdown">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="https://vk.com/proictis">
-                    <img src="{{ url_for('static', filename='images/vk_logo.png') }}" width="30" height="30" alt="Логотип ВКонтакте">
-                </a>
-            </div>
             <div class="navbar-nav ml-auto">
                 {{ render_nav_item('main.logout', 'Выйти') }}
             </div>

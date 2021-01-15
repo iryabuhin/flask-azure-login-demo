@@ -31,6 +31,15 @@ class Config:
     CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or os.environ.get('REDIS_URL', 'redis://localhost:6379')
     CACHE_DEFAULT_TIMEOUT = 5 * 60
 
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.googlemail.com'
+    MAIL_PORT = os.environ.get('MAIL_PORT') or 587
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') or 1
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
+
+
 
 
     @staticmethod

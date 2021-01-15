@@ -86,6 +86,12 @@ def get_project_teams(id: str):
 @api.route('/api/projects/<id>/join', methods=['PUT'])
 @required_data
 def join_project(id: str, name: str, group: str, team: str):
+    count = mongo.db.projects.count_documents({'teams.members.fullName': name})
+
+    if count >= 1:
+        proj = get_project_by_id(id, fields=['name'])
+        return error(f'Вы уже записаны на проект "{proj["name"]}"')
+
     # названия команд в формате "Команда N (свободных мест: P)"
     team_number = int(team.split()[1]) - 1
     document_team_field_string = f'teams.{str(team_number)}.members'
@@ -96,13 +102,6 @@ def join_project(id: str, name: str, group: str, team: str):
     if team.get('emptySlots') <= 0:
         return error(f'В команде №{str(team_number)} нет свободных мест')
     
-    count = mongo.db.projects.count_documents({'teams.members.fullName': name})
-
-    if count >= 1:
-        proj = get_project_by_id(id, fields=['name'])
-        return error(f'Вы уже записаны на проект "{proj["name"]}"')
-
-
     updated_document = mongo.db.projects.find_one_and_update(
         {'_id': ObjectId(id)},
         {
@@ -113,14 +112,13 @@ def join_project(id: str, name: str, group: str, team: str):
                     'group': group
                 }
             },
-            # декрементировать количество свободных мест в этой команде на единицу
+            # уменьшить количество свободных мест в этой команде на единицу
             '$inc': {
                 f'teams.{str(team_number)}.emptySlots': -1
             }
         },
         return_document=ReturnDocument.AFTER
     )
-
 
     insert_result = sheets_team_add_member(
         f'{name}, {group}',
